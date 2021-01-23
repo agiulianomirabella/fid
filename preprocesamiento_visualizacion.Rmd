@@ -1,0 +1,206 @@
+---
+title: "Heart Failure Prediction"
+author: Lola Gómez Jemes
+output: html_notebook
+---
+
+El dataset elegido para este proyecto ha sido Heart Failure Prediction, disponible en Kaggle (link: https://www.kaggle.com/andrewmvd/heart-failure-clinical-data). 
+
+Las enfermedades cardiovasculares (ECV) son la primera causa de muerte en el mundo, y se calcula que se cobran 17,9 millones de vidas cada año.
+
+La insuficiencia cardíaca es un evento común causado por las ECV. En este conjunto de datos se presentab 12 características,  como el consumo de tabaco, la dieta poco saludable y la obesidad, que pueden utilizarse para predecir la mortalidad por insuficiencia cardíaca.
+
+Antes de comenzar a trabajar con los datos, vamos a cargar dos librerías:
+* Dplyr (BUSCA DEFINICIÓN)
+* Ggplot2 (busca definición)
+```{r}
+library(dplyr)
+library(ggplot2)
+```
+
+A continuación, procedemos a cargar los datos. Además, vamos a utilizar una serie de funciones para comenzar a conocer los datos.
+```{r}
+data <- read.csv('./data/heart_failure.csv')
+str(data)
+dim(data)
+colnames(data)
+
+```
+
+Como se ha podido observar, el data set contiene 299 instancias y 13 atributos. Estos atributos son: edad (número), anemia (1: sí, 0:no), nivel de creatina (número), diabetes (1: sí, 0:no), fracción de eyección (número), presión sanguínea (número), ni ACABAR DE PONERLO
+
+```{r}
+head(data)
+```
+
+Vamos a ver cuantos de los pacientes han muerto:
+```{r}
+death<- data %>%
+  group_by(data$DEATH_EVENT) %>%
+  count()
+
+
+
+colnames(death)<-c('Fallecido','Total')
+death
+```
+
+Vamos a ver mortalidad por género:
+```{r}
+porc_mujer<- data %>%
+  filter(sex==0) %>%
+  group_by(DEATH_EVENT)%>%
+  count() 
+
+porc_mujer<- porc_mujer%>%
+  mutate(porcentaje_muertos= round(n*100/sum(porc_mujer$n),2))
+
+
+colnames(porc_mujer)<- c('Fallecido', 'Total', 'Porcentaje' )
+
+
+porc_hombre<- data %>%
+  filter(sex==1) %>%
+  group_by(DEATH_EVENT)%>%
+  count() 
+
+
+porc_hombre<-porc_hombre%>%
+  mutate(porcentaje_muertos= round(n*100/sum(porc_hombre$n),2))
+
+
+colnames(porc_hombre)<- c('Fallecida', 'Total', 'Porcentaje' )
+
+
+
+  
+```
+
+
+```{r}
+death_by_gender <- data %>%
+  filter(DEATH_EVENT==1) %>%
+  group_by(sex)%>%
+  count()
+
+
+ death_by_gender <- death_by_gender%>%
+   mutate(porcentaje_muertos= round(n*100/sum(death_by_gender$n),2))
+ 
+death_by_gender$sex[death_by_gender$sex==1]<-'hombre'
+death_by_gender$sex[death_by_gender$sex==0]<-'mujer'
+```
+
+
+```{r}
+
+min(data$age)
+max(data$age)
+
+edad_death<- data%>%
+  group_by(age, DEATH_EVENT) %>%
+  arrange(data$age)%>%
+  count()
+
+edad_death$DEATH_EVENT[edad_death$DEATH_EVENT==0]<-'vivo'
+edad_death$DEATH_EVENT[edad_death$DEATH_EVENT==1]<-'fallecido'
+
+
+ggplot(data= edad_death, mapping = aes(x=age, y=n, color=DEATH_EVENT))+
+  geom_line()+
+  facet_wrap(~DEATH_EVENT)
+  
+ 
+ 
+
+  
+
+```
+
+
+
+Edad media 
+```{r}
+
+media_supervivientes <- data %>%
+  filter(DEATH_EVENT==0)%>%
+  summarise(mean(age), median(age))
+
+media_muertos <- data %>%
+  filter(DEATH_EVENT==1)%>%
+  summarise(mean(age), median(age))
+
+```
+
+Fumar:
+```{r}
+fumar_muertos <- data %>%
+  filter(DEATH_EVENT==1)%>%
+  group_by(smoking, sex) %>%
+  count()
+
+
+fumar_muertos<- fumar_muertos %>%
+  mutate(porc=n*100/sum(fumar_muertos$n)) %>%
+  arrange(smoking)
+
+fumar_muertos$sex[fumar_muertos$sex==0]<-'mujer'
+fumar_muertos$sex[fumar_muertos$sex==1]<-'hombre'
+fumar_muertos$smoking[fumar_muertos$smoking==0]<-'no'
+fumar_muertos$smoking[fumar_muertos$smoking==1]<-'sí'
+
+
+ggplot(data= fumar_muertos, aes(x=fumar_muertos$smoking, y=fumar_muertos$porc, fill=sex))+
+  geom_bar(stat="identity", position="dodge")
+```
+Hipertensión:
+
+```{r}
+hiper_tension <-data %>%
+  filter(data$high_blood_pressure==1) %>%
+  group_by(DEATH_EVENT)%>%
+  count()
+  
+```
+
+
+Los valores normales de la creatinfosfoquinasa (CPK) son entre 32 y 294 U/L para los hombres y 33 a 211 U/L. Valores de altos, pueden afectar. Veamos qué ocurre en el data set:
+
+```{r}
+
+cpk_mujeres<- data%>%
+  filter(data$sex==0 , data$creatinine_phosphokinase>294) %>%
+  group_by(DEATH_EVENT)%>%
+  count()
+
+
+cpk_hombres<- data%>%
+  filter(data$sex==1 , data$creatinine_phosphokinase>211) %>%
+  group_by(DEATH_EVENT)%>%
+  count() 
+
+
+porc_muert_muj_cpk<- cpk_mujeres$n[cpk_mujeres$DEATH_EVENT==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex=='mujer']
+
+porc_muert_hombre_cpk<- cpk_hombres$n[cpk_hombres$DEATH_EVENT==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex=='hombre']
+```
+
+A normal heart's ejection fraction may be between 50 and 70 percent. Por debajo, puede ser un problema:
+
+```{r}
+
+ejection_fraction <- data %>%
+  filter(data$ejection_fraction<50) %>%
+  group_by(DEATH_EVENT)%>%
+  count()
+
+
+
+```
+
+The typical reference range for serum creatinine is 60 to 110 micromoles per liter (μmol/L) (0.7 to 1.2 milligrams per deciliter (mg/dL)) for men and 45 to 90 μmol/L (0.5 to 1.0 mg/dL) for women:
+
+ACABAR ESTO!!!!!
+
+
+
