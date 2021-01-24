@@ -1802,172 +1802,101 @@ summary {
 <p>El dataset elegido para este proyecto ha sido Heart Failure Prediction, disponible en Kaggle (link: <a href="https://www.kaggle.com/andrewmvd/heart-failure-clinical-data" class="uri">https://www.kaggle.com/andrewmvd/heart-failure-clinical-data</a>).</p>
 <p>Las enfermedades cardiovasculares (ECV) son la primera causa de muerte en el mundo, y se calcula que se cobran 17,9 millones de vidas cada año.</p>
 <p>La insuficiencia cardíaca es un evento común causado por las ECV. En este conjunto de datos se presentab 12 características, como el consumo de tabaco, la dieta poco saludable y la obesidad, que pueden utilizarse para predecir la mortalidad por insuficiencia cardíaca.</p>
-<p>Antes de comenzar a trabajar con los datos, vamos a cargar dos librerías: * Dplyr (BUSCA DEFINICIÓN) * Ggplot2 (busca definición)</p>
+<p>En este documento se recoge una primera toma de contacto con los datos, en el que se van a estudiar algunos de los atributos del dataset y su influencia o no en la supervivencia del paciente.</p>
+<p>Antes de comenzar a trabajar con los datos, vamos a cargar dos librerías: * Dplyr: es uno de los paquetes principales de tidyverse. Se trata de un conjunto de funciones diseñadas para permitir la manipulación de marcos * Ggplot2: s un paquete de visualización de datos.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmBgYCJ9 -->
-<pre class="r"><code>library(dplyr)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiXG5BdHRhY2hpbmcgcGFja2FnZTog46S847ixZHBseXLjpLzjuLJcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDjpLzjuLFwYWNrYWdlOnN0YXRz46S847iyOlxuXG4gICAgZmlsdGVyLCBsYWdcblxuVGhlIGZvbGxvd2luZyBvYmplY3RzIGFyZSBtYXNrZWQgZnJvbSDjpLzjuLFwYWNrYWdlOmJhc2XjpLzjuLI6XG5cbiAgICBpbnRlcnNlY3QsIHNldGRpZmYsIHNldGVxdWFsLCB1bmlvblxuIn0= -->
-<pre><code>
-Attaching package: 㤼㸱dplyr㤼㸲
-
-The following objects are masked from 㤼㸱package:stats㤼㸲:
-
-    filter, lag
-
-The following objects are masked from 㤼㸱package:base㤼㸲:
-
-    intersect, setdiff, setequal, union</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShnZ3Bsb3QyKVxuYGBgIn0= -->
-<pre class="r"><code>library(ggplot2)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGlicmFyeShkcGx5cilcbmxpYnJhcnkoZ2dwbG90MilcbmBgYCJ9 -->
+<pre class="r"><code>library(dplyr)
+library(ggplot2)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>A continuación, procedemos a cargar los datos. Además, vamos a utilizar una serie de funciones para comenzar a conocer los datos.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGF0YSA8LSByZWFkLmNzdignLi9kYXRhL2hlYXJ0X2ZhaWx1cmUuY3N2JylcbnN0cihkYXRhKVxuZGltKGRhdGEpXG5jb2xuYW1lcyhkYXRhKVxuXG5gYGBcbmBgYCJ9 -->
-<pre class="r"><code>```r
-data &lt;- read.csv(&#39;./data/heart_failure.csv&#39;)
-str(data)
-dim(data)
-colnames(data)
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-Como se ha podido observar, el data set contiene 299 instancias y 13 atributos. Estos atributos son: edad (número), anemia (1: sí, 0:no), nivel de creatina (número), diabetes (1: sí, 0:no), fracción de eyección (número), presión sanguínea (número), ni ACABAR DE PONERLO
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaGVhZChkYXRhKVxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-head(data)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-Vamos a ver cuantos de los pacientes han muerto:
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGVhdGg8LSBkYXRhICU+JVxuICBncm91cF9ieShkYXRhJERFQVRIX0VWRU5UKSAlPiVcbiAgY291bnQoKVxuXG5cblxuY29sbmFtZXMoZGVhdGgpPC1jKCdGYWxsZWNpZG8nLCdUb3RhbCcpXG5kZWF0aFxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-death&lt;- data %&gt;%
-  group_by(data$DEATH_EVENT) %&gt;%
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGF0YSA8LSByZWFkLmNzdignLi9kYXRhL2hlYXJ0X2ZhaWx1cmUuY3N2JylcbnN0cihkYXRhKVxuYGBgIn0= -->
+<pre class="r"><code>data &lt;- read.csv(&#39;./data/heart_failure.csv&#39;)
+str(data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiJ2RhdGEuZnJhbWUnOlx0Mjk5IG9icy4gb2YgIDEzIHZhcmlhYmxlczpcbiAkIGFnZSAgICAgICAgICAgICAgICAgICAgIDogaW50ICA3NSA1NSA2NSA1MCA2NSA5MCA3NSA2MCA2NSA4MCAuLi5cbiAkIGFuYWVtaWEgICAgICAgICAgICAgICAgIDogaW50ICAwIDAgMCAxIDEgMSAxIDEgMCAxIC4uLlxuICQgY3JlYXRpbmluZV9waG9zcGhva2luYXNlOiBpbnQgIDU4MiA3ODYxIDE0NiAxMTEgMTYwIDQ3IDI0NiAzMTUgMTU3IDEyMyAuLi5cbiAkIGRpYWJldGVzICAgICAgICAgICAgICAgIDogaW50ICAwIDAgMCAwIDEgMCAwIDEgMCAwIC4uLlxuICQgZWplY3Rpb25fZnJhY3Rpb24gICAgICAgOiBpbnQgIDIwIDM4IDIwIDIwIDIwIDQwIDE1IDYwIDY1IDM1IC4uLlxuICQgaGlnaF9ibG9vZF9wcmVzc3VyZSAgICAgOiBpbnQgIDEgMCAwIDAgMCAxIDAgMCAwIDEgLi4uXG4gJCBwbGF0ZWxldHMgICAgICAgICAgICAgICA6IG51bSAgMjY1MDAwIDI2MzM1OCAxNjIwMDAgMjEwMDAwIDMyNzAwMCAuLi5cbiAkIHNlcnVtX2NyZWF0aW5pbmUgICAgICAgIDogbnVtICAxLjkgMS4xIDEuMyAxLjkgMi43IDIuMSAxLjIgMS4xIDEuNSA5LjQgLi4uXG4gJCBzZXJ1bV9zb2RpdW0gICAgICAgICAgICA6IGludCAgMTMwIDEzNiAxMjkgMTM3IDExNiAxMzIgMTM3IDEzMSAxMzggMTMzIC4uLlxuICQgc2V4ICAgICAgICAgICAgICAgICAgICAgOiBpbnQgIDEgMSAxIDEgMCAxIDEgMSAwIDEgLi4uXG4gJCBzbW9raW5nICAgICAgICAgICAgICAgICA6IGludCAgMCAwIDEgMCAwIDEgMCAxIDAgMSAuLi5cbiAkIHRpbWUgICAgICAgICAgICAgICAgICAgIDogaW50ICA0IDYgNyA3IDggOCAxMCAxMCAxMCAxMCAuLi5cbiAkIGRlYXRoICAgICAgICAgICAgICAgICAgIDogaW50ICAxIDEgMSAxIDEgMSAxIDEgMSAxIC4uLlxuIn0= -->
+<pre><code>&#39;data.frame&#39;:   299 obs. of  13 variables:
+ $ age                     : int  75 55 65 50 65 90 75 60 65 80 ...
+ $ anaemia                 : int  0 0 0 1 1 1 1 1 0 1 ...
+ $ creatinine_phosphokinase: int  582 7861 146 111 160 47 246 315 157 123 ...
+ $ diabetes                : int  0 0 0 0 1 0 0 1 0 0 ...
+ $ ejection_fraction       : int  20 38 20 20 20 40 15 60 65 35 ...
+ $ high_blood_pressure     : int  1 0 0 0 0 1 0 0 0 1 ...
+ $ platelets               : num  265000 263358 162000 210000 327000 ...
+ $ serum_creatinine        : num  1.9 1.1 1.3 1.9 2.7 2.1 1.2 1.1 1.5 9.4 ...
+ $ serum_sodium            : int  130 136 129 137 116 132 137 131 138 133 ...
+ $ sex                     : int  1 1 1 1 0 1 1 1 0 1 ...
+ $ smoking                 : int  0 0 1 0 0 1 0 1 0 1 ...
+ $ time                    : int  4 6 7 7 8 8 10 10 10 10 ...
+ $ death                   : int  1 1 1 1 1 1 1 1 1 1 ...</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGltKGRhdGEpXG5gYGAifQ== -->
+<pre class="r"><code>dim(data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDI5OSAgMTNcbiJ9 -->
+<pre><code>[1] 299  13</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY29sbmFtZXMoZGF0YSlcbmBgYCJ9 -->
+<pre class="r"><code>colnames(data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcImFnZVwiICAgICAgICAgICAgICAgICAgICAgIFwiYW5hZW1pYVwiICAgICAgICAgICAgICAgICAgXCJjcmVhdGluaW5lX3Bob3NwaG9raW5hc2VcIlxuIFs0XSBcImRpYWJldGVzXCIgICAgICAgICAgICAgICAgIFwiZWplY3Rpb25fZnJhY3Rpb25cIiAgICAgICAgXCJoaWdoX2Jsb29kX3ByZXNzdXJlXCIgICAgIFxuIFs3XSBcInBsYXRlbGV0c1wiICAgICAgICAgICAgICAgIFwic2VydW1fY3JlYXRpbmluZVwiICAgICAgICAgXCJzZXJ1bV9zb2RpdW1cIiAgICAgICAgICAgIFxuWzEwXSBcInNleFwiICAgICAgICAgICAgICAgICAgICAgIFwic21va2luZ1wiICAgICAgICAgICAgICAgICAgXCJ0aW1lXCIgICAgICAgICAgICAgICAgICAgIFxuWzEzXSBcImRlYXRoXCIgICAgICAgICAgICAgICAgICAgXG4ifQ== -->
+<pre><code> [1] &quot;age&quot;                      &quot;anaemia&quot;                  &quot;creatinine_phosphokinase&quot;
+ [4] &quot;diabetes&quot;                 &quot;ejection_fraction&quot;        &quot;high_blood_pressure&quot;     
+ [7] &quot;platelets&quot;                &quot;serum_creatinine&quot;         &quot;serum_sodium&quot;            
+[10] &quot;sex&quot;                      &quot;smoking&quot;                  &quot;time&quot;                    
+[13] &quot;death&quot;                   </code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Como se ha podido observar, el data set contiene 299 instancias y 13 atributos. Estos atributos son: edad, anemia (1: sí, 0:no), nivel de creatina, diabetes (1: sí, 0:no), fracción de eyección, presión sanguínea (1: alta, 0:no está alta), nivel de plaquetas , nivel de creatina sérica, sodio sérico, sexo, fumador (1: sí, 0:no), tiempo (hace refencia al tiempo que se ha estado haciendo seguimiento al paciente), y muerte (1:muerto, 0:vivo).</p>
+<p>Vamos a echar un vistazo a los datos. Para ello, vamos a mostras las 5 primeras instancias del data frame:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGVhZChkYXRhKVxuYGBgIn0= -->
+<pre class="r"><code>head(data)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6NiwibmNvbCI6MTN9LCJyZGYiOiJINHNJQUFBQUFBQUFCbldUdlc3VVFCQ0ExNzd6L1ltRWc2T2dTb2tveUNFT1JTa3ZKeEFORFZCRk5HWmpiODVMN0YzTHV4WXBBMG9SV2pxb0VPK0F4Qk5Rd1hQUTBDQ0JSSFV3YTgvb0hFdTMwcWY1MjVtZEdjdlBIaDdlSHgyT0dHTWQxZ1U2QWFpczkrREp2ZG5lakxHdUQ1WUhrYUdUcDNCckFzb1cwZ01lQS92QUFwaWhmTjZJTjQvWEFPUCtJOFoyUG9QK0R0REFSK0R1aG55cXdScnhHOEF0bE1UdFJ0emJVR1BieFJmak8rNDl0aGhmLzd2ejVlblBSZWZyV1dVUFA5Vnk4dWRGSlFjL0tMZkttNitPcXpQLzlkNmREL1BmMzl6NVR2NkRvUFlmc05yZjZPY05jQUc4QnQ0Q0ZqaHY5ZHVFK20zdncydnBGTytpN0NNRFpGTjk1TktIRGhUUGhBRmxYQ1hXemc1ZkNsVDdYSEdSU1k3bXphZ1EzRW9sbFFqelJCdmdSQ3B1NlBvZ2x2eElXS2hZMjlmRVN4RlpxVlY0WFBCS3djQWtrY3NrUEVxMWpzTzhFTWFVQmRVWTVpbTNJaFdXaW95TktNb3NYRCtOL2l1MTMraFlsaG0xYnNRcHRXNHkxOXdTemE2VkdXVUdNWlJLV3FzWUZ2clZsTmJoZHVpZjFUdnZ0WGNXcGR6UXpzZzVpcm5sVTVnU0htRnMxVXJwNjl3TkQwbSsrNnVDVnJKWHRCeFhTK1U2aVhlanBGUW51M3Z1QVhiNWovTHdLMit0ZmU1Si94K1dDckJVVDZqbGVtZEJDdDhuUldNYkpxNEdudWFGVkpZbUFhK1pXbTA1M1J0Rk9pVlBOUnRiL1FlSCtGQWJUUVFBQUE9PSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["age"],"name":[1],"type":["int"],"align":["right"]},{"label":["anaemia"],"name":[2],"type":["int"],"align":["right"]},{"label":["creatinine_phosphokinase"],"name":[3],"type":["int"],"align":["right"]},{"label":["diabetes"],"name":[4],"type":["int"],"align":["right"]},{"label":["ejection_fraction"],"name":[5],"type":["int"],"align":["right"]},{"label":["high_blood_pressure"],"name":[6],"type":["int"],"align":["right"]},{"label":["platelets"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["serum_creatinine"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["serum_sodium"],"name":[9],"type":["int"],"align":["right"]},{"label":["sex"],"name":[10],"type":["int"],"align":["right"]},{"label":["smoking"],"name":[11],"type":["int"],"align":["right"]},{"label":["time"],"name":[12],"type":["int"],"align":["right"]},{"label":["death"],"name":[13],"type":["int"],"align":["right"]}],"data":[{"1":"75","2":"0","3":"582","4":"0","5":"20","6":"1","7":"265000","8":"1.9","9":"130","10":"1","11":"0","12":"4","13":"1","_rn_":"1"},{"1":"55","2":"0","3":"7861","4":"0","5":"38","6":"0","7":"263358","8":"1.1","9":"136","10":"1","11":"0","12":"6","13":"1","_rn_":"2"},{"1":"65","2":"0","3":"146","4":"0","5":"20","6":"0","7":"162000","8":"1.3","9":"129","10":"1","11":"1","12":"7","13":"1","_rn_":"3"},{"1":"50","2":"1","3":"111","4":"0","5":"20","6":"0","7":"210000","8":"1.9","9":"137","10":"1","11":"0","12":"7","13":"1","_rn_":"4"},{"1":"65","2":"1","3":"160","4":"1","5":"20","6":"0","7":"327000","8":"2.7","9":"116","10":"0","11":"0","12":"8","13":"1","_rn_":"5"},{"1":"90","2":"1","3":"47","4":"0","5":"40","6":"1","7":"204000","8":"2.1","9":"132","10":"1","11":"1","12":"8","13":"1","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10],"total":[13]},"rows":{"min":[10],"max":[10],"total":[6]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>A continuación, vamos a calcular cuántos pacientes han fallecido:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGVhdGg8LSBkYXRhICU+JVxuICBncm91cF9ieShkYXRhJGRlYXRoKSAlPiVcbiAgY291bnQoKVxuXG5cblxuY29sbmFtZXMoZGVhdGgpPC1jKCdGYWxsZWNpZG8nLCdUb3RhbCcpXG5kZWF0aFxuYGBgIn0= -->
+<pre class="r"><code>death&lt;- data %&gt;%
+  group_by(data$death) %&gt;%
   count()
 
 
 
 colnames(death)&lt;-c(&#39;Fallecido&#39;,&#39;Total&#39;)
 death</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjJ9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFReXdyQ01CRGNhcXRZOEFGK2h3VVY4UU1VenlJZVBCcmJxTVdZbERaRmovNmYvMlRkaEExS0RtbG1wN096TzltdEQvUDRFQU5BRzBJODdRZ2hkRmJiNld3eEF3aGJXQVg0cDJmdUo2ckdDQXpacHh1czRGZS84Unk5eGlnVnJLb1FqUDdJT0dPYUplZVMzYmtuNzVYcWtVamtLK2Y3d2svVE5CL2YxNGxHZGpoMWI1Z1FQTTB6NVZSN3BabEE0TGQzVmFGekpkR2daVkpGM29KQjZSSERXcHFCMlNTOTF2STJXWm9RbEI1bzArRHZkUWlia1dGRFZoRlpkYmk4NUpLN0RRVTdjVUhGQU5QYlhFbFI1bEs3MTBLMlNyUk5Ra3lxaEdOc052aDhBZFI5QVhqTkFRQUEifQ== --&gt;
-
-&lt;div data-pagedtable=&quot;false&quot;&gt;
-  &lt;script data-pagedtable-source type=&quot;application/json&quot;&gt;
-{&quot;columns&quot;:[{&quot;label&quot;:[&quot;Fallecido&quot;],&quot;name&quot;:[1],&quot;type&quot;:[&quot;int&quot;],&quot;align&quot;:[&quot;right&quot;]},{&quot;label&quot;:[&quot;Total&quot;],&quot;name&quot;:[2],&quot;type&quot;:[&quot;int&quot;],&quot;align&quot;:[&quot;right&quot;]}],&quot;data&quot;:[{&quot;1&quot;:&quot;0&quot;,&quot;2&quot;:&quot;203&quot;},{&quot;1&quot;:&quot;1&quot;,&quot;2&quot;:&quot;96&quot;}],&quot;options&quot;:{&quot;columns&quot;:{&quot;min&quot;:{},&quot;max&quot;:[10],&quot;total&quot;:[2]},&quot;rows&quot;:{&quot;min&quot;:[10],&quot;max&quot;:[10],&quot;total&quot;:[2]},&quot;pages&quot;:{}}}
-  &lt;/script&gt;
-&lt;/div&gt;
-
-&lt;!-- rnb-frame-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-Vamos a ver mortalidad por género:
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxucG9yY19tdWplcjwtIGRhdGEgJT4lXG4gIGZpbHRlcihzZXg9PTApICU+JVxuICBncm91cF9ieShERUFUSF9FVkVOVCklPiVcbiAgY291bnQoKSBcblxucG9yY19tdWplcjwtIHBvcmNfbXVqZXIlPiVcbiAgbXV0YXRlKHBvcmNlbnRhamVfbXVlcnRvcz0gcm91bmQobioxMDAvc3VtKHBvcmNfbXVqZXIkbiksMikpXG5cblxuY29sbmFtZXMocG9yY19tdWplcik8LSBjKCdGYWxsZWNpZG8nLCAnVG90YWwnLCAnUG9yY2VudGFqZScgKVxuXG5cbnBvcmNfaG9tYnJlPC0gZGF0YSAlPiVcbiAgZmlsdGVyKHNleD09MSkgJT4lXG4gIGdyb3VwX2J5KERFQVRIX0VWRU5UKSU+JVxuICBjb3VudCgpIFxuXG5cbnBvcmNfaG9tYnJlPC1wb3JjX2hvbWJyZSU+JVxuICBtdXRhdGUocG9yY2VudGFqZV9tdWVydG9zPSByb3VuZChuKjEwMC9zdW0ocG9yY19ob21icmUkbiksMikpXG5cblxuY29sbmFtZXMocG9yY19ob21icmUpPC0gYygnRmFsbGVjaWRhJywgJ1RvdGFsJywgJ1BvcmNlbnRhamUnIClcblxuXG5cbiAgXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-porc_mujer&lt;- data %&gt;%
-  filter(sex==0) %&gt;%
-  group_by(DEATH_EVENT)%&gt;%
-  count() 
-
-porc_mujer&lt;- porc_mujer%&gt;%
-  mutate(porcentaje_muertos= round(n*100/sum(porc_mujer$n),2))
-
-
-colnames(porc_mujer)&lt;- c(&#39;Fallecido&#39;, &#39;Total&#39;, &#39;Porcentaje&#39; )
-
-
-porc_hombre&lt;- data %&gt;%
-  filter(sex==1) %&gt;%
-  group_by(DEATH_EVENT)%&gt;%
-  count() 
-
-
-porc_hombre&lt;-porc_hombre%&gt;%
-  mutate(porcentaje_muertos= round(n*100/sum(porc_hombre$n),2))
-
-
-colnames(porc_hombre)&lt;- c(&#39;Fallecida&#39;, &#39;Total&#39;, &#39;Porcentaje&#39; )
-
-
-
-  </code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZGVhdGhfYnlfZ2VuZGVyIDwtIGRhdGEgJT4lXG4gIGZpbHRlcihERUFUSF9FVkVOVD09MSkgJT4lXG4gIGdyb3VwX2J5KHNleCklPiVcbiAgY291bnQoKVxuXG5cbiBkZWF0aF9ieV9nZW5kZXIgPC0gZGVhdGhfYnlfZ2VuZGVyJT4lXG4gICBtdXRhdGUocG9yY2VudGFqZV9tdWVydG9zPSByb3VuZChuKjEwMC9zdW0oZGVhdGhfYnlfZ2VuZGVyJG4pLDIpKVxuIFxuZGVhdGhfYnlfZ2VuZGVyJHNleFtkZWF0aF9ieV9nZW5kZXIkc2V4PT0xXTwtJ2hvbWJyZSdcbmRlYXRoX2J5X2dlbmRlciRzZXhbZGVhdGhfYnlfZ2VuZGVyJHNleD09MF08LSdtdWplcidcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-death_by_gender &lt;- data %&gt;%
-  filter(DEATH_EVENT==1) %&gt;%
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjJ9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFReXdyQ01CRGNhcXUwNEFQOGpoYTArQVdLWnhFUEhvMXQxR0pNcEkzbzBmL3puNnlic0VISkljM3NkSFoySjV2bExrOTJDUUIwSWNUVGpSQkNiN0dlenVZemdMQ0RWWUIvWW5NL1VUVkJZTWdCM1dBRnYvcU5aKzgxUm9WZ1RZTmcvRWNtSmRNc085YnN5ajE1WEt0SEpwRnZuTzhMUDIzYmZueGZKeHJiNGRTOVlrTHdvaXFWVTIyVlpnS0IzOTVYTjEwcGlRWWRreXJ5Rmd4cWp4amRwUmxZcHNYNUxpOXBia0pRZXFCTmc3L1hJV3hHaGkxWlJXVFY0L0pVU2U0MkZPekFCUlZEVEc5elpiZTZrdHE5RnJKTnBtMFNZZ29sSEdPendlY0xIZk1JTHMwQkFBQT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Fallecido"],"name":[1],"type":["int"],"align":["right"]},{"label":["Total"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"0","2":"203"},{"1":"1","2":"96"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Ahora, vamos a visualizar la mortalidad según el sexo:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZGVhdGhfYnlfZ2VuZGVyIDwtIGRhdGEgJT4lXG4gIGZpbHRlcihkZWF0aD09MSkgJT4lXG4gIGdyb3VwX2J5KHNleCklPiVcbiAgY291bnQoKVxuXG5cbiBkZWF0aF9ieV9nZW5kZXIgPC0gZGVhdGhfYnlfZ2VuZGVyJT4lXG4gICBtdXRhdGUocG9yY2VudGFqZV9tdWVydG9zPSByb3VuZChuKjEwMC9zdW0oZGVhdGhfYnlfZ2VuZGVyJG4pLDIpKVxuIFxuZGVhdGhfYnlfZ2VuZGVyJHNleFtkZWF0aF9ieV9nZW5kZXIkc2V4PT0xXTwtJ2hvbWJyZSdcbmRlYXRoX2J5X2dlbmRlciRzZXhbZGVhdGhfYnlfZ2VuZGVyJHNleD09MF08LSdtdWplcidcblxuZGVhdGhfYnlfZ2VuZGVyXG5gYGAifQ== -->
+<pre class="r"><code>death_by_gender &lt;- data %&gt;%
+  filter(death==1) %&gt;%
   group_by(sex)%&gt;%
   count()
 
@@ -1976,147 +1905,155 @@ death_by_gender &lt;- data %&gt;%
    mutate(porcentaje_muertos= round(n*100/sum(death_by_gender$n),2))
  
 death_by_gender$sex[death_by_gender$sex==1]&lt;-&#39;hombre&#39;
-death_by_gender$sex[death_by_gender$sex==0]&lt;-&#39;mujer&#39;</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
+death_by_gender$sex[death_by_gender$sex==0]&lt;-&#39;mujer&#39;
 
-&lt;!-- rnb-chunk-end --&gt;
+death_by_gender</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjN9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFRd1VvRE1SQ2Q3bTRxWFdoWjlPNUJFTHgwb1JYQmsxVDBBNnFuSGdSSnQ5RnUzVTJXSklzOWV2SHMxd2llL1IzdkhydE8wZ1FrZ2NtK2VmTjJKbS91YnhmbjZTSUZnQmdTakpnZ2hQN05mREs5bUFJa0VXWTlyQXpNZDR1cUl5c0Z5REFpVnlCMXUySFNKZjIxcUplU0lScGFDY0FKeGhYR3lPU3o2OC92ajRlejM5bjg5UGpyN3VjOW1FR0tpaXJsK25zeVhWRk44eWRKYXhiSUIxSzg1aHg1NWVlOTRkVjEzUzdzNjBXWnMycklXTEd0OThZZE9HeUVMQmpYZE1NZTY1WkpMY3hmWWJzRDBlaFNjQ3hGWmlFa2VIQlBCa1RXY3ZPQTFiaFl0L3hsUExrMHJteDlmNFlPUi85d3ZKK1pkSzRYOFF0bS9Mbmt6QnVyNkpKVkxobmhPcXpSdkpFbDEzNTl5S3BjQzAyOUxpMUU1UmxyRG5aL2ZGTEdLd2tDQUFBPSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["sex"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]},{"label":["porcentaje_muertos"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"mujer","2":"34","3":"35.42"},{"1":"hombre","2":"62","3":"64.58"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>A simple vista, parece que la mortalidad es más alta en hombres que en mujeres, pero al calcular el porcentaje de muertos en cada sexo nos encontramos frente a esto:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucG9yY19tdWplcjwtIGRhdGEgJT4lXG4gIGZpbHRlcihzZXg9PTApICU+JVxuICBncm91cF9ieShkZWF0aCklPiVcbiAgY291bnQoKSBcblxucG9yY19tdWplcjwtIHBvcmNfbXVqZXIlPiVcbiAgbXV0YXRlKHBvcmNlbnRhamVfbXVlcnRvcz0gcm91bmQobioxMDAvc3VtKHBvcmNfbXVqZXIkbiksMikpXG5cblxuY29sbmFtZXMocG9yY19tdWplcik8LSBjKCdGYWxsZWNpZGEnLCAnVG90YWwnLCAnUG9yY2VudGFqZScgKVxucG9yY19tdWplclxuYGBgIn0= -->
+<pre class="r"><code>porc_mujer&lt;- data %&gt;%
+  filter(sex==0) %&gt;%
+  group_by(death)%&gt;%
+  count() 
+
+porc_mujer&lt;- porc_mujer%&gt;%
+  mutate(porcentaje_muertos= round(n*100/sum(porc_mujer$n),2))
 
 
-&lt;!-- rnb-text-begin --&gt;
+colnames(porc_mujer)&lt;- c(&#39;Fallecida&#39;, &#39;Total&#39;, &#39;Porcentaje&#39; )
+porc_mujer</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjN9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFRc1U3RE1CQzlORWxSSTFFcXdSZXdONElpMkpBaWdhQmpoQmk2SG82QmdMR0w0d3JFeEwrdzh6dk1UUHhGdzluWW92Snc5dDM1K2IxN2QzVytPQ29XQlFDa2tGR2tPYVV3UEtzUFo4Y3pnR3hBVlVJdkkzdS9FbXJYUVFHMktld2pPTUIvZlVteFR6RzJkVlgvZk82OWZjK3I2dURqcXpoOWpnaHpKckRyS0psc05Jc0dEWmEzR3A5NEJCOXA5VkpLNm5kQjc1Mk92dS9YTVc4QVRid3Y5L3NDaGVDc2JUQ2dycFZCRVZScnBSbVhCaDlJRldMQ0xiVTByWkpFT2JEKzgyamtSRWVOblpXMEl6UlRkcitTajlNVEsrRDNCSDcyeE84cjVPbWZaTlo3cXR4VERibThheVVQTXd1ODRXSG1NZTNET1MyWHVwVW1PS0Z1VjVwTmIweUowSEhlWVAwTGhKNW14dmNCQUFBPSJ9 -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Fallecida"],"name":[1],"type":["int"],"align":["right"]},{"label":["Total"],"name":[2],"type":["int"],"align":["right"]},{"label":["Porcentaje"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0","2":"71","3":"67.62"},{"1":"1","2":"34","3":"32.38"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5wb3JjX2hvbWJyZTwtIGRhdGEgJT4lXG4gIGZpbHRlcihzZXg9PTEpICU+JVxuICBncm91cF9ieShkZWF0aCklPiVcbiAgY291bnQoKSBcblxucG9yY19ob21icmU8LXBvcmNfaG9tYnJlJT4lXG4gIG11dGF0ZShwb3JjZW50YWplX211ZXJ0b3M9IHJvdW5kKG4qMTAwL3N1bShwb3JjX2hvbWJyZSRuKSwyKSlcblxuXG5jb2xuYW1lcyhwb3JjX2hvbWJyZSk8LSBjKCdGYWxsZWNpZG8nLCAnVG90YWwnLCAnUG9yY2VudGFqZScgKVxucG9yY19ob21icmVcbmBgYCJ9 -->
+<pre class="r"><code>
+porc_hombre&lt;- data %&gt;%
+  filter(sex==1) %&gt;%
+  group_by(death)%&gt;%
+  count() 
+
+porc_hombre&lt;-porc_hombre%&gt;%
+  mutate(porcentaje_muertos= round(n*100/sum(porc_hombre$n),2))
 
 
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5taW4oZGF0YSRhZ2UpXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-
+colnames(porc_hombre)&lt;- c(&#39;Fallecido&#39;, &#39;Total&#39;, &#39;Porcentaje&#39; )
+porc_hombre</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjN9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFRUFU4RE1RejFmUlgxSkVvbC9rU1hua1JSR2FFU2lMa2doZzRzSVJmZ1NraXFYQ29ZR2RqNVQvQ2J5dGpEU1dOUlpYQmlPeS92K2ZuMmFuRmFMa29BeUNESHlBcE1vWGM1UDVsTUp3QjVpbFdDTDMxM3Z5UHEyRU1CRGpIY0kzakFmLzJKY1k0eGNQWHNKdjI2SDIxK1poZWJiMHgrSThLQ1M5YTJtQXozbW1YTkxLc2VEWHNWRWJ4djlGdWxzTitTM2djZVhkZHRZMTRDRFlNdi8vdWFTU2w0VTJ0QzNXbkxKS25PdGVGQ1diWkVWWWdKRC9US05sb2haZXI4RjlISWlZa2FSMnZsUnFqSC9IbXRYc1puVGlEc0NjTHNTZGdYNWRsT011OENWUkdvZWtJOU5VclF6Skk5Q0pwNWdQdndUcXVWYVpRbEo5aHRLN3Z2ald0SkhlOE50bjlYS0tSQjl3RUFBQT09In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["Fallecido"],"name":[1],"type":["int"],"align":["right"]},{"label":["Total"],"name":[2],"type":["int"],"align":["right"]},{"label":["Porcentaje"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"0","2":"132","3":"68.04"},{"1":"1","2":"62","3":"31.96"}],"options":{"columns":{"min":{},"max":[10],"total":[3]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTkFcbmBgYCJ9 -->
+<pre class="r"><code>NA</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>El 31,96% de las hombres totales han fallecido, frente al 32,37% de las mujeres.</p>
+<p>A continuación, vamos a estudiar la edad. Vamos a crear dos gráficas, en las que se muestre el número de personas vivas y muertas según la edad.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5taW4oZGF0YSRhZ2UpXG5gYGAifQ== -->
+<pre class="r"><code>
 min(data$age)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQwXG4ifQ== --&gt;
-</code></pre>
-<p>[1] 40</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxubWF4KGRhdGEkYWdlKVxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-max(data$age)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiWzFdIDk1XG4ifQ== --&gt;
-</code></pre>
-<p>[1] 95</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZWRhZF9kZWF0aDwtIGRhdGElPiVcbiAgZ3JvdXBfYnkoYWdlLCBERUFUSF9FVkVOVCkgJT4lXG4gIGFycmFuZ2UoZGF0YSRhZ2UpJT4lXG4gIGNvdW50KClcblxuZWRhZF9kZWF0aCRERUFUSF9FVkVOVFtlZGFkX2RlYXRoJERFQVRIX0VWRU5UPT0wXTwtJ3Zpdm8nXG5lZGFkX2RlYXRoJERFQVRIX0VWRU5UW2VkYWRfZGVhdGgkREVBVEhfRVZFTlQ9PTFdPC0nZmFsbGVjaWRvJ1xuXG5cbmdncGxvdChkYXRhPSBlZGFkX2RlYXRoLCBtYXBwaW5nID0gYWVzKHg9YWdlLCB5PW4sIGNvbG9yPURFQVRIX0VWRU5UKSkrXG4gIGdlb21fbGluZSgpK1xuICBmYWNldF93cmFwKH5ERUFUSF9FVkVOVClcbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-edad_death&lt;- data%&gt;%
-  group_by(age, DEATH_EVENT) %&gt;%
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQwXG4ifQ== -->
+<pre><code>[1] 40</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubWF4KGRhdGEkYWdlKVxuYGBgIn0= -->
+<pre class="r"><code>max(data$age)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDk1XG4ifQ== -->
+<pre><code>[1] 95</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZWRhZF9kZWF0aDwtIGRhdGElPiVcbiAgZ3JvdXBfYnkoYWdlLCBkZWF0aCkgJT4lXG4gIGFycmFuZ2UoZGF0YSRhZ2UpJT4lXG4gIGNvdW50KClcblxuZWRhZF9kZWF0aCRkZWF0aFtlZGFkX2RlYXRoJGRlYXRoPT0wXTwtJ3Zpdm8nXG5lZGFkX2RlYXRoJGRlYXRoW2VkYWRfZGVhdGgkZGVhdGg9PTFdPC0nZmFsbGVjaWRvJ1xuXG5cbmdncGxvdChkYXRhPSBlZGFkX2RlYXRoLCBtYXBwaW5nID0gYWVzKHg9YWdlLCB5PW4sIGNvbG9yPWRlYXRoKSkrXG4gIGdlb21fbGluZSgpK1xuICBmYWNldF93cmFwKH5kZWF0aClcbmBgYCJ9 -->
+<pre class="r"><code>edad_death&lt;- data%&gt;%
+  group_by(age, death) %&gt;%
   arrange(data$age)%&gt;%
   count()
 
-edad_death$DEATH_EVENT[edad_death$DEATH_EVENT==0]&lt;-&#39;vivo&#39;
-edad_death$DEATH_EVENT[edad_death$DEATH_EVENT==1]&lt;-&#39;fallecido&#39;
+edad_death$death[edad_death$death==0]&lt;-&#39;vivo&#39;
+edad_death$death[edad_death$death==1]&lt;-&#39;fallecido&#39;
 
 
-ggplot(data= edad_death, mapping = aes(x=age, y=n, color=DEATH_EVENT))+
+ggplot(data= edad_death, mapping = aes(x=age, y=n, color=death))+
   geom_line()+
-  facet_wrap(~DEATH_EVENT)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-plot-begin --&gt;
-
-&lt;img src=&quot;data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAArwAAAGwCAMAAAB8TkaXAAABR1BMVEUAAAAAADoAAGYAOmYAOpAAZrYAv8QZGT8ZGWIZP2IZP4EZYp8aGhozMzM6AAA6ADo6AGY6Ojo6OpA6kNs/GRk/GT8/GWI/P4E/gb1NTU1NTW5NTY5NbqtNjshiGRliGT9iGWJiPxlin9lmAABmADpmAGZmOgBmZmZmkJBmtv9uTU1uTW5uTY5ubo5ubqtuq+SBPxmBPz+Bn4GBvdmOTU2OTW6OTY6Obk2ObquOyP+QOgCQOjqQkGaQtpCQ27aQ2/+fYhmfvYGf2b2f2dmrbk2rbm6rbo6rjk2ryKur5OSr5P+2ZgC225C2/9u2//+9gT+9vYG92b292dnIjk3I///Zn2LZvYHZ2Z/Z2b3Z2dnbkDrb25Db/9vb///kq27k///r6+vy8vL4dm3/tmb/yI7/25D/29v/5Kv//7b//8j//9v//+T///+Pas9XAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAaRUlEQVR4nO3d/3/d9HXHcSdL1K0LkOENMAS6Je02AyN0BDaHMtM1dF0CaUfcQNIm0eR4tmP9/z9P0tW9V1+OpHOlj3Qk3df7Abm+um/L0snTsq5i++6EhEw0O9YbQEjbgJdMNuAlkw14yWQDXjLZgJdMNhvifbLFYQbrGYwj4FWHGYB3smEG4J1smAF4JxtmAN7JhhmAd7JhBuCdbJgBeCcbZgBeTX789No7i7cev/Wb6L/cg+n9Hz+9OdDWpBl4BuUUB2EQ1/y6ZZx4139NAt4024d3BHHNr1tGifeHD6795LPHf3vt2s0l3mjJX/5m+cDi/l/9w83l4mEy7Axyefz2909+/OW/vvXr5PazQXc7F9f8umWUeGOyP/zss1RujPXrd578/q+Tg+0ff/qHxf0/RrTjm59+P9BGDTyDbCKwEeA/vPWfye33g+52Lq75dcto8cY3P/x9ijeWvLizeDB6O5Yc38QPDZOBZ5DL76NP3neiHU9uh93tXFzz65YR4/36WvTFMcX7wbVr8QnD298/WZ8Gf30zvokPSsNk4Bnk8vjt//llfL60vB1wt3Nxza9bRov3hw9urk8b4mPNk+UBeRuPvNEJ79vfRzue3HLkTTNavDHUx3/32fqcNzrLi895H7/16+07543OG669k3zuxrfD7nYurvl1y2jxRn9N8QWF9dWGn3yWudrw46dbdbXhSfx5/CT9fH4y7G7n4ppft4wT7yjDDMA72TAD8E42zAC8kw0zAO9kwwwmjtfPJHenLupiH013qxRmMJM90zdd8+sW8Kqbwgxmsmf6pmt+3QJedVOYwUz2TN90za9bwKtuCjOYyZ7pm675dQt41U1hBjPZM33TNb9uAa+6KcxgJnumb7rm1y3gVTeFGcxkz/RN1/y6BbzqpjCDmeyZvumaX7eAV90UZjCTPdM3XfPrFvCqm8IMZrJn+qZrft0CXnVTmMFM9kzfdM2vW8CrbgozmMme6Zuu+XULeNVNYQYz2TN90zW/bgGvuinMYCZ7pm+65tctNXhPP9zbOwjD8zt7N14sl7UayUz+ioUZzGTP9M1+MW6aarznn98PTz+6f3HvIHz+/nJhq5HM5K9YmMFM9kzf7FnjhqnG+zIW++jg/Iuj8PTjo3Rhq5HM5K84LM9gJnumb/asccPUn/NGR9/TT14kB+EwfC3KMBu11fGsN2A6qcV7ce92+PLGEm+cVp/PMzk+heUZ9LFnnvtVbuOR9/zO7ehp2yfgTR8vzwC8pqm92nAQ/ck57+rx8gzAa5pqvAu7yakDVxuSx8szAK9pqvE+34tzwHXe1ePlGYDXNPwLm7opzAC8pgGvuinMALymAa+6KcwAvKYBr7opzAC8pgGvuinMALymAa+6KcwAvKYBr7opzAC8pgGvuinMALymAa+6KcwAvKYBr7opzAC8pgGvuinMALymAa+6KcygB5Lg1Qe86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwgx7weuBVB7zqpjCDofCK760/mIM3SauRgBe8vQS86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMAPwmmZDvKRl1K9r6UlN8b15qUyOvOqmMAOOvKYBr7opzAC8pgGvuinMALymAa+6KcwAvKYBr7opzAC8pgGvuinMALymAa+6KcwAvKYBr7opzMAWr8G3rbvm1y3gVTeFGYDXNOBVN4UZqFfuhVpp4NUHvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMAPwmga86qYwA/CaBrzqpjAD8JoGvOqmMIPB8KoXigFvklYjAS94ewl41U1hBuA1DXjVTWEG4DUNeNVNYQYD4fXEZ2zgBa+6KcwAvKYBr7opzAC8pgGvuinMALymAa+6KcwAvKYBr7opzMASr36V4F2k1UjAC95eAl51U5gBeE0DXnVTmAF4TQNedVOYAXhNA151U5gBeE0DXnVTmAF4TQNedVOYAXhNA151U5gBeE0DXnVTmIEtXvVv7wNvklYjAS94e0kt3tOPj8Lw+d7e3ntH6ZJWIwHvJniFJnjl1OF9maB9dJBZ1Gok4AVvL6nB++jd30VH3otv7meWtRoJeMHbSxpPG87vRKcNycH3tSjDbNT84qlfbFVqiu/t8QKujXhPP7qfOfq2+nzmyMuRt5c0P2GLszrvbTUS8IK3l4BX3QzLMwCvaRrxvrzxIrz4LZfKwJs8PqqorvO+u7rg0Gok4AVvL+Ff2NRNYQbgNQ141U1hBuA1DXjVTWEG4DUNeNVNYQbgNQ141U1hBuA1DXjVTWEG4DUNeNVNYQbgNQ141U1hBu7xej541QGvuinMALymAa+6KcwAvKYBr7opzAC8pgGvuinMoCNe8WctwasOeNVNYQbgNQ141U1hBuA1DXjVTWEG4DUNeNVNYQbgNQ141U1hBuA1DXjVTWEG4DUNeNVNYQbgNQ141U1hBsZ4tXrBm6TVSMAL3l4CXnVTmAF4TQNedVOYAXhNA151U5gBeE0DXnVTmAF4TQNedVOYwWB4hSp4watvCjMAr2nAq24KMwCvacaFN1A3R4xXZAreHgJedVOYgRZvRFJeLDXBqw141U1hBuA1DXjVTWEG4DUNeNVNYQbgNQ141U1hBuA1DXjVTWEG4DUNeNVNYQbgNQ141U1hBuA1zYZ4e05gvQEuIr/UatXi8iLp5Vvlhdv++q0cedVNYQYceU0DXnVTmEE3vNJ3Okp4PXGl4AWvvinMALxJXt3diXN1/ebO5YfRnac7u+slO1fPbu3H7ePksew77lz+7u7VZMHTq+sVnN26uqh/t1oDeNs2wVuNdzf588qz9M3l4n9KnZ68cRj9KeFdtp8mC1/d3V8vOru1s7+qL9YA3rZN8NbjTXBm8R5f/vb1fSXeRePk+sMs3n9+8xl43TTB24A3+qKfw/vgyp/Ts4FmvOGD3eIKonq8ELwumuBtwnt85VmG49mt3fRsQIP3ODnn2M/jjY7E4HXSBG8j3ssPl8+30kPmyeK8YYk382QufcdV++znh/FZQ2ZRbP3pLnidNMG72ZH3wdX4katZvDVH3vi84enVMH/kjUmD10UTvE14H+RPWdeHWQ3e4+gMeb+IN/IMXhdN8G50tWFxurs4b9DgPfv5V9FZQxHvqy9/BV4HTfBucp03PWFY3Gjwhg/+5mpYwhse70wEbwDezfAq9Q70L2y76zd3Ln2VXuJ9eumwDm/aPkyY7ucWpfUH4HXQBC/f21CTWeCtIOkar+eDF7zqpjAD8LbKyeuZs4UOAa+6KcwAvKYBr7opzAC8pgGvuinMALymAa+6KcwAvKYBr7opzAC8pgGvuinMALxJ/ldOF5eqgFfdFGYA3iTg9cHrg3ejgFfdFGYA3iTgjRKEar3gBS949U1hBuBNAl4fvD54Nwp41U1hBuBNAl4fvP4s8b66u5P+cMTJ9YfxDwhnk96Pf+h98+Twpt+qdvlhVRu8IXjLqce79irgTdMdb/pjR3VpNRLwbjPes1s7lw7jw+L+Em+0JD4+Lh5Y3P+Lf9xfLm6JN/2hIfBWPA7eSrxBOdkjb/obRVK8i9/QEB9sj6/8aXE//vm1+ObKs7Z4FcfuViMBrxpvtGCSeBWnDWe/SPHGkhd3Utm/iH9Pzn58Ez/UEm/25zrBW34cvO3xPoifSqV4byU/AXQS/wrI1Wnwg+T3kr36sjXe8u+SAm/2cfC2xRufkK5OG+JD7NK0wyNvc1qNBLzbjjeGevLG4fqcN/mtZjHob12d84K3/nHwtj5teLoTX1BYX22If254dbXh1V0HVxtKOf34KAzP7+zdeAFe8CaPt8DbX+rwvtx77yi8uHcQPn9/uajVSMAL3l5Sg/fRu7+LjrznXxwtjsBJWo0EvODtJY2nDaefvAjPP78f3XstSr8bE8zhJTA99atVCk2xWLlwLC+BOVq8L28s8cZp9fnMkbf7kbdUXRx5dYdejrxJWo0EvODtJY14OeddPV6eAXiTjBbvxb3bXG1YPF6eAXiTjBYv13lXj5dnAN4ko8RbTquRgBe8vQS86qYwA/AmAa8PXvBuFvCqm8IMwJsEvD54wbtZwKtuCjMAbxIF3oqfGu4W8KqbwgzAm4Qjrw/eWeKNf1bt1ZdfXf82uT3c/FvOqzMmvIEP3oni9cpZ4o1/qPLkzT9d/y65fbb5D/tUB7zqpjAD8CapP214uhv9F53zJrctfsyyOuBVN4UZdMIrfY/5HPGevPnnL5OfvUxvN/0B9+qAV90UZtAOr7e+2Qa80Qnvm88itMktR94+PnifeL2k6WXuLm+2AW/4dGc3/RHi3bDFD7hXB7zqpjAD8CZpwHvyRvKbypLbFj/gXh3wqpvCDIR3qSK5xXh7C3jVTWEG4E0CXvD64N0s4FU3hRmANwl4wevLeL3sO2WWghe86qYwA/AmAe/W4PVmh9cq4FU3hRmA1zTgVTeFGYDXNOBVN4UZgNc04FU3hRmA1zTgVTeFGbTDm+HYGa9KL3iTtBoJeMHbS8CrbgozAK9phsCrFVmBV3z32eFdLcvi9XKPFNYJXvCqm8IMwGsa8KqbwgzAaxrwqpvCDMBrGvCqm8IMwGua8eMNxPcHL3jBq28KMwCvacCrbgozAK9pwKtuCjMAr2k2xNsq2tdkDcTqxF7TVXqt1dxLrXrZ+57QySzzSu9d6I/lBVxtwpFX3RRm0ObI6/nqI6/Hkbc24FU3hRn0jTfTAW854FU3hRnY4fV88E4Cr7QC8IJ3/HgDeQXgBe8QeAPwNuP1wLt5hsCr/Rbzrca7uqYLXnWmitf9j1y0wSvIAe9wGRneMkrwgrcq4FU3hRmA1zSTxavVC17wpmkzEvCCt5+MCG/gV+EV9G4d3sJKwRuCd4OmMAPXeOP/wavO2PEGmT/zy5V6wQveNG1GAt4i3tUpAng7ZaJ4A+EEQ86E8Xo+eGsDXnVTmEELvF7uD/B2yXTxKvXOHa9GL3iTtBkJeMHbT8CrbgozKL/gH3gHzDTwlheDF7zg1TeFGYDXNCPHGxRu1+sUFooZGG9GaG5hS7xLwKV1gjd0jlfyNBhe8cMMgncNCLwDBrzqpjAD8JoGvOqmMAPwmmbKeKvKuYwWb74J3hZxi1f8RkXwgrefTARvabmIV/o44AVvmoYdNcXb8ZeajQZvZhl4awNedVOYAXhNM268gfBWus7yUvBWbnlzRdl0za9bHOMVf9DXPd7AHxne3HkqeAcKeNVNYQab410/3oh32QdvVZziDaTLVerXcp8uXs/vitfzwbt5BsGr+xaaFnhziyeOd+kUvOqAV90UZgBe00wFb/EMAbzgVeB9vre3995Reqd+R63xSh8HvNuM99FB5k79jg6Pt9AAr7zlzRVlsw+C7dOI9+Kb+5l79TvqGm9Q8baINyiWqrayKuCdHd7zO9FpQ3LwfS1KbTUIpddflZdWvHu+GVS8nbmTf0t89dc+s3xpVa+4oFzKvTarV35NV3HZemHFOquXb0Ea8Z5+dD9z9K39LJWPfcZHXt015ji9HXm9dOXr4+36gOr6yCseh7f2yJtkdd5bu6PjxKvWO0q863+8A28pc8er/rXs88DrgTeblzdehBe/VV0q6xVvQfJI8C6/toPXIqrrvO+uLjjU7ih4G/FmJPaDVzxv2F68udTuqD3e8gfS/y7UqeLNPQDemtTuKHit8XrF2nIztdlavEHmz9zitnjr/rVtZHj9PDHwDpKp410tlj+6+oP7o8O7fAS8ldkCvFq94AVvcX/BOxher1TT7Zm+6Zpft4B3FfCCt7i/WryBX483/9xsmni9zKKe8Ep6wZukbkdHi1epF7zbizfI3WSX2+FNiz3jzX61tsQrfex0M7UBb3H5gHjL58ngBW+amh0Fr++7wuvFSR8Bb2VGjLd8/pp5ayO8Or1jwpt5Z/BWBryrgBe8xf0dBm9QKq1WKW2UlKnj9aReupnagLe43BHe9YKN8ao2ALxbi1fUs1gA3hSvl13UF15BL3iTVO9oFd6geA2hKtuM18ssA686w+DV4Nl6vCnaAt7i87H1nQJeuZdupjbgLS4fAV7NBoB36/EK/7TgGm/G5Gqp9OGDzFb2jTdPCLyDZLx4y+8yI7wroODtEPCu4gKv+KRpELxe+R0ym6nNduKtRDcSvIotAC94+8ObfXI2Fryrs1cN3tyyGryl9xbXWYW3rBe8SSp31Biv+G7gXW+mMuD1Cw8Y4Q1yWzkvvMtVrpaLJxqZzVQGvH7hgVHgbd4E8IJXiVe8ipttOsebTXnd08G7fI7YEW/5eV1VM/v4qDI7vMUViH8dNnjzy7R4c6tZ3nbH2+5X8rnm1y2O8Ep4Vndb4ZV8jRNvWaFgSYU3bW6Id7WgWMxuprA28KZpgbfcc4s3KG9l1TbWNLOPl2dggdeT8MonGpnNlFYmfBjw5gJe8PYVK7yl11rV4M38g0Q3vOLap4J3ibUSb0llec88sQde8Po5Fp648lHgVV6XyD4+qtjhzS9bPbvaFry55gZ4PV/A60nN3GbKhe3CW5VAfHN9t/Q6lEHVa1oGxQVNKyu+8mXtCio2skO83MtWZl/ssvxm9t1yTS+3zKt4l+WfXmGlXvFjNL4Mpld6Y5Jxc+QVDqKZe46PvMsTjIpVBbmbwY68+cut4z7ylrauslmMa37dAt5V+sHrySsHr4MY4hVOVMOSvfJ7NeHNnBgXipXbWNfMPF6ewfB400tcebzFfgPemutq4PUL98AL3l5ihLfiEkET3rX5jnil9U8Gr+814K0/Gag7xwCvX7i3zXi9dTOX8eDN3QevX7hXhXe9NCPNEd7VknnhXT5pKzxhk6r5zax8DLzgnTDe7JItxFvimnnDMd7ld5L3gLf64ly6pvIMGvF6mWYubfCufl26Fm/5DFwqgzeTPvFKUy5+m0RLvEEofcwR4c28cx6vVJC3whfxZpaBd3m7/BrfiDcrzRBvw+FYmIEjvF52mTu80i+YrHkuKG1mMa75dUufeJdf0MNSpUDULd78eYQWr/xyg9kFwgyKeEtXyDbC67vGu7wNS9sl9uvXuXh8VOkPb+B3wNtk1zneQNzMrnhrvh7b4K1ac9XzymJc8+sWG7xBqbpa5UB4hQ0KhQ/cjHdFzSHeik3OvHMD3uzlYBXe5QPgXf2pxJuTZoy36smnPz28nl/CW73mrcUrHq3Sp031eAtPrszwZq++BVUlYQYJ3vRtL28j9/zNCm/6/2qVNWv25M0sxDW/bukL79LgJPAGuWYgl1rgrbuAaoG3bsXgXd/fAG/2alQbvMIPIgdyUdwEv4g389AmeH1vXHhXh34d3uUHr49rft3SE97VM7Ep4A2KzUAozQBvw3qb1pls3KjSL96Fqxq8+S/xNniXb4WlB/PrFWaQx5vH4Y0B7+IzKix9LlW8D3izeBR4c0/o2+Gt/vgt8YpbIcygHq9XaBYeXt/2gdfLvBGWzsgr3gm8zXgDseuv8TbarcWbOxRX/nUEhdt8U9gMYQZWeJuPkl4LvMkJRn1c8+sWB3jr7Iwfb9V1icLZuD95vKq1gjfI4azHmz9hdYW3oiiUqpmXrsAJMyg8YcvHGwPeVbPx35yTMniLV6Hq8RZWORq8peeBwgzq8fqFpvhoX3iLTY3dLcRbioi36heTl/BW/uZyv9CUV1FcUL2VxQ9Uag6Dd/Ut5iPAu32nDZ0n0mvT3SqFGcxkz/RN1/y6BbzqpjCDmeyZvumaX7eAV90UZjCTPdM3XfPrFvCqm8IMZrJn+qZrft0CXnVTmMFM9kzfdM2vW8CrbgozmMme6Zuu+XULeNVNYQYz2TN90zW/bgGvuinMYCZ7pm+65tct4FU3hRnMZM/0Tdf8ugW86qYwg5nsmb7pml+3gFfdFGYwkz3TN13z6xbwqpvCDGayZ/qma37dAl51U5jBTPZM33TNr1vAq24KM5jJnumbrvl1C3jVTWEGM9kzfdM1v27p8AqYr7nbimmtst+VT20GhgHv2FY+tRkYBrxjW/nUZmAY8I5t5VObgWEcveo7IcMHvGSyAS+ZbMBLJhvwksmmJd6LewdheH5n78YLR9txcW/v3ftuV3n64d57R25XmY3zEUxwBsZpiff53kHyt/f8fUfb8eggfHnjhctVnn9+P3zudpW5OB/BBGdgnHZ4T//l3w7C8y+OwtOPj5xsRryu9MbVKk8/eRGvz+Uqc6t3PYIJzsA6rfBefPPf0edyMpnoU9tFTj/5r/hLpstVpkcdl6vMxP0IpjcD87TC+/x2/IUo+hLnDu+HiQSXq0xP9Jyuch33I5jeDMzTBm804QvnR95kXU5X+dH98OV7R/0cdXoYweRmYJ82eJ/vxbnt9Jz335Pxulxlerjp53yvhxFMbgb26XCp7OLebadXG5KjmbtVpkcdp1uZjfMRTHAGxhnLdd5oXa4vSL7cc37ZNBv313mnNwPj8C9sZLIBL5lswEsmG/CSyQa8ZLIBL5lswEsmG/CSyQa8ZLIBb3NOXt/Z2dkNw7NbO5e+uv4wfHV3Z+fyQ+utIuBtztmt/TB8evnh2a3d6O3LD1/dvRrdv/LMersIeBvzfzHTkzcOj+OjbYQ4uU1EE9uAV5Hj6LTh0mFysD25/vDpTpJd660i4G3M2a1Lh/GRd4WXM4aRBLyNOY6xHl9anDZEf0RvWm8SSQLexsRYT16/dLh+whZpRvAIAt7mPIjOeP8jeoIWXyr71eXFpTLsjiDg3SzHnPCOJ+BVJz5TSK7xkpEEvPrE18iwO6KAl0w24CWTDXjJZANeMtmAl0w24CWTDXjJZPP/ZaPmCtqnIfsAAAAASUVORK5CYII=&quot; /&gt;
-
-&lt;!-- rnb-plot-end --&gt;
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuTkFcbk5BXG5OQVxuTkFcbk5BXG5OQVxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-NA
+  facet_wrap(~death)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-plot-begin eyJoZWlnaHQiOjQzMi42MzI5LCJ3aWR0aCI6NzAwLCJzaXplX2JlaGF2aW9yIjowLCJjb25kaXRpb25zIjpbXX0= -->
+<p><img src="data:image/png;base64,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" /></p>
+<!-- rnb-plot-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuTkFcbk5BXG5OQVxuTkFcbk5BXG5OQVxuYGBgIn0= -->
+<pre class="r"><code>NA
 NA
 NA
 NA
 NA
 NA</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-
-
-Edad media 
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5tZWRpYV9zdXBlcnZpdmllbnRlcyA8LSBkYXRhICU+JVxuICBmaWx0ZXIoREVBVEhfRVZFTlQ9PTApJT4lXG4gIHN1bW1hcmlzZShtZWFuKGFnZSksIG1lZGlhbihhZ2UpKVxuXG5tZWRpYV9tdWVydG9zIDwtIGRhdGEgJT4lXG4gIGZpbHRlcihERUFUSF9FVkVOVD09MSklPiVcbiAgc3VtbWFyaXNlKG1lYW4oYWdlKSwgbWVkaWFuKGFnZSkpXG5cbmBgYFxuYGBgIn0= --&gt;
-
-```r
-```r
-
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Vemos que tenemos un pico de personas fallecidas en torno a los 60 años.</p>
+<p>Vamos a ver la edad media de cada grupo. Además, vamos a enfrentar este valor a la mediana.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5tZWRpYV9zdXBlcnZpdmllbnRlcyA8LSBkYXRhICU+JVxuICBmaWx0ZXIoZGVhdGg9PTApJT4lXG4gIHN1bW1hcmlzZShtZWFuKGFnZSksIG1lZGlhbihhZ2UpKVxuXG5tZWRpYV9zdXBlcnZpdmllbnRlc1xuYGBgIn0= -->
+<pre class="r"><code>
 media_supervivientes &lt;- data %&gt;%
-  filter(DEATH_EVENT==0)%&gt;%
+  filter(death==0)%&gt;%
   summarise(mean(age), median(age))
 
+media_supervivientes</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6Mn0sInJkZiI6Ikg0c0lBQUFBQUFBQUJsMVB3V3JDUUJDZFJLTWtVbEc4OVF2MFlNQVVieDRLZWkySUo2L1RaTFdoeWE0a0t4YjZILzBHdjFJN0czZUU3Q0hzbTVkNTc4M2JiZlp2MFQ0Q2dBNTA2ZXNFQktHMzNpNlNaUUxROVdueTZFOW8zaC9hbWhBdzVOQVE3eC80K3ZzM3ZoSithUllCVm80b2tGaUttc0NvRVQ3SXNCUW9wM2dVTTBzTVNwSGxUTFVOd2twZFlqYmhGTTlOU1F1c09ZWEpLRU9OOGFFaUxVMDNSOUpYSjUwclNTTGZkQW9jc1ZjNXhPZ3N6UlhaUFAwNnkrOTVzalFKOWh4b24vYkUvaVBUdjF1dndIcjFoRHptVXZEeEJYNkt3ZzVEcXR1MGpVOVZMalZYSWJhT3RkTEllMUdxQ21hYWNuRDdCNnIxRGZqTUFRQUEifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["mean(age)"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["median(age)"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"58.75862","2":"60"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5tZWRpYV9tdWVydG9zIDwtIGRhdGEgJT4lXG4gIGZpbHRlcihkZWF0aD09MSklPiVcbiAgc3VtbWFyaXNlKG1lYW4oYWdlKSwgbWVkaWFuKGFnZSkpXG5cbm1lZGlhX211ZXJ0b3NcbmBgYCJ9 -->
+<pre class="r"><code>
 media_muertos &lt;- data %&gt;%
-  filter(DEATH_EVENT==1)%&gt;%
+  filter(death==1)%&gt;%
   summarise(mean(age), median(age))
-</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
 
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-Fumar:
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuZnVtYXJfbXVlcnRvcyA8LSBkYXRhICU+JVxuICBmaWx0ZXIoREVBVEhfRVZFTlQ9PTEpJT4lXG4gIGdyb3VwX2J5KHNtb2tpbmcsIHNleCkgJT4lXG4gIGNvdW50KClcblxuXG5mdW1hcl9tdWVydG9zPC0gZnVtYXJfbXVlcnRvcyAlPiVcbiAgbXV0YXRlKHBvcmM9bioxMDAvc3VtKGZ1bWFyX211ZXJ0b3MkbikpICU+JVxuICBhcnJhbmdlKHNtb2tpbmcpXG5cbmZ1bWFyX211ZXJ0b3Mkc2V4W2Z1bWFyX211ZXJ0b3Mkc2V4PT0wXTwtJ211amVyJ1xuZnVtYXJfbXVlcnRvcyRzZXhbZnVtYXJfbXVlcnRvcyRzZXg9PTFdPC0naG9tYnJlJ1xuZnVtYXJfbXVlcnRvcyRzbW9raW5nW2Z1bWFyX211ZXJ0b3Mkc21va2luZz09MF08LSdubydcbmZ1bWFyX211ZXJ0b3Mkc21va2luZ1tmdW1hcl9tdWVydG9zJHNtb2tpbmc9PTFdPC0nc8ODwq0nXG5cblxuZ2dwbG90KGRhdGE9IGZ1bWFyX211ZXJ0b3MsIGFlcyh4PWZ1bWFyX211ZXJ0b3Mkc21va2luZywgeT1mdW1hcl9tdWVydG9zJHBvcmMsIGZpbGw9c2V4KSkrXG4gIGdlb21fYmFyKHN0YXQ9XFxpZGVudGl0eVxcLCBwb3NpdGlvbj1cXGRvZGdlXFwpXG5gYGBcbmBgYCJ9 --&gt;
-
-```r
-```r
-fumar_muertos &lt;- data %&gt;%
-  filter(DEATH_EVENT==1)%&gt;%
+media_muertos</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6Mn0sInJkZiI6Ikg0c0lBQUFBQUFBQUJsMlBVUXVDTUJESFQ5TkNvd2o2RXZXUWtPRzdVSzlCQkVHdlM1ZEp1b2t1NnROWHQ3a1ZPaGk3KyszK2QvYy83czRiLyt3RHdBQWN2QU1YUXhodUQrc3dDZ0VjR3pNTGZ6ejV2ckJxam9HRVV3bml3LzRrenorUG9UMGRvY3RJU1JzTVprcmNRcStraEMxSVJwY2FqRXVhNWdaMUczZzFmd2FteVVSOXFOdWRraFNrTVZNTTlGTWlTSEN0VVl2WnV5Y1o4VXJrbktISWxyN2NudGlxZTJEMllIS0xkSlhjSHV5K0NpTTVRYThEM2RWK3NkM090RCs2bDZ0N0RTbkxja2JOOGdXNTBFSW5VN1NyM0FaVm5UTmhyQ0J0QXNFRk1YVit3Z3REbERsNGZ3SHFUWENyMEFFQUFBPT0ifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["mean(age)"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["median(age)"],"name":[2],"type":["dbl"],"align":["right"]}],"data":[{"1":"65.20833","2":"65"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>La edad media de muerte se encuentra en torno a los 65 años, frente a la de supervivencia de 59 años.</p>
+<p>Veamos ahora si, a simple vista, el factor fumar afecta a la supervivencia de los pacientes.</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZnVtYXJfbXVlcnRvcyA8LSBkYXRhICU+JVxuICBmaWx0ZXIoZGVhdGg9PTEpJT4lXG4gIGdyb3VwX2J5KHNtb2tpbmcsIHNleCkgJT4lXG4gIGNvdW50KClcblxuXG5mdW1hcl9tdWVydG9zPC0gZnVtYXJfbXVlcnRvcyAlPiVcbiAgbXV0YXRlKHBvcmM9bioxMDAvc3VtKGZ1bWFyX211ZXJ0b3MkbikpICU+JVxuICBhcnJhbmdlKHNtb2tpbmcpXG5cbmZ1bWFyX211ZXJ0b3Mkc2V4W2Z1bWFyX211ZXJ0b3Mkc2V4PT0wXTwtJ211amVyJ1xuZnVtYXJfbXVlcnRvcyRzZXhbZnVtYXJfbXVlcnRvcyRzZXg9PTFdPC0naG9tYnJlJ1xuZnVtYXJfbXVlcnRvcyRzbW9raW5nW2Z1bWFyX211ZXJ0b3Mkc21va2luZz09MF08LSdubydcbmZ1bWFyX211ZXJ0b3Mkc21va2luZ1tmdW1hcl9tdWVydG9zJHNtb2tpbmc9PTFdPC0nc8OtJ1xuXG5cbmdncGxvdChkYXRhPSBmdW1hcl9tdWVydG9zLCBhZXMoeD1mdW1hcl9tdWVydG9zJHNtb2tpbmcsIHk9ZnVtYXJfbXVlcnRvcyRwb3JjLCBmaWxsPXNleCkpK1xuICBnZW9tX2JhcihzdGF0PVwiaWRlbnRpdHlcIiwgcG9zaXRpb249XCJkb2RnZVwiKVxuYGBgIn0= -->
+<pre class="r"><code>fumar_muertos &lt;- data %&gt;%
+  filter(death==1)%&gt;%
   group_by(smoking, sex) %&gt;%
   count()
 
@@ -2128,92 +2065,109 @@ fumar_muertos&lt;- fumar_muertos %&gt;%
 fumar_muertos$sex[fumar_muertos$sex==0]&lt;-&#39;mujer&#39;
 fumar_muertos$sex[fumar_muertos$sex==1]&lt;-&#39;hombre&#39;
 fumar_muertos$smoking[fumar_muertos$smoking==0]&lt;-&#39;no&#39;
-fumar_muertos$smoking[fumar_muertos$smoking==1]&lt;-&#39;sÃ­&#39;
+fumar_muertos$smoking[fumar_muertos$smoking==1]&lt;-&#39;sí&#39;
 
 
 ggplot(data= fumar_muertos, aes(x=fumar_muertos$smoking, y=fumar_muertos$porc, fill=sex))+
-  geom_bar(stat=\identity\, position=\dodge\)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-plot-begin --&gt;
-
-&lt;img src=&quot;data:image/png;base64,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&quot; /&gt;
-
-&lt;!-- rnb-plot-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-Hipertensión:
-
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGlwZXJfdGVuc2lvbiA8LWRhdGEgJT4lXG4gIGZpbHRlcihkYXRhJGhpZ2hfYmxvb2RfcHJlc3N1cmU9PTEpICU+JVxuICBncm91cF9ieShERUFUSF9FVkVOVCklPiVcbiAgY291bnQoKVxuYGBgIn0= --&gt;
-
-```r
-hiper_tension &lt;-data %&gt;%
-  filter(data$high_blood_pressure==1) %&gt;%
-  group_by(DEATH_EVENT)%&gt;%
-  count()</code></pre>
+  geom_bar(stat=&quot;identity&quot;, position=&quot;dodge&quot;)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3I6IE11c3QgZ3JvdXAgYnkgdmFyaWFibGVzIGZvdW5kIGluIGAuZGF0YWAuXG4qIENvbHVtbiBgREVBVEhfRVZFTlRgIGlzIG5vdCBmb3VuZC5cblJ1biBgcmxhbmc6Omxhc3RfZXJyb3IoKWAgdG8gc2VlIHdoZXJlIHRoZSBlcnJvciBvY2N1cnJlZC5cbiJ9 -->
-<pre><code>Error: Must group by variables found in `.data`.
-* Column `DEATH_EVENT` is not found.
-Run `rlang::last_error()` to see where the error occurred.</code></pre>
-<!-- rnb-output-end -->
+<!-- rnb-plot-begin eyJoZWlnaHQiOjQzMi42MzI5LCJ3aWR0aCI6NzAwLCJzaXplX2JlaGF2aW9yIjowLCJjb25kaXRpb25zIjpbXX0= -->
+<p><img src="data:image/png;base64,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" /></p>
+<!-- rnb-plot-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5mdW1hZG9yYSA8LSBkYXRhJT4lXG4gIGZpbHRlcihzZXg9PTAsIHNtb2tpbmc9PTEpJT4lXG4gIGNvdW50KClcblxuZnVtYWRvcmFcbmBgYCJ9 -->
+<pre class="r"><code>
+fumadora &lt;- data%&gt;%
+  filter(sex==0, smoking==1)%&gt;%
+  count()
+
+fumadora</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImRhdGEuZnJhbWUiXSwibnJvdyI6MSwibmNvbCI6MX0sInJkZiI6Ikg0c0lBQUFBQUFBQUJsMVB5dzZDTUJCY0hzVkFvaUh4TzJnaXhvTm4vUURqaVd1RnFrVGNFaWpScjBjWDBpYmFRN1BkNmN4MDVud3N0a21SQUVBQUlaMkEwUldpdzJtVDczS0EwS2ZObzVkNG1tOWlyV2NBWUdsbTZKQVlpcWZzNlpMK0t0Rmh4WjE2Y2N1MFZwNXJWVGFpZDYyU1NtakJyeDFwYVJzZHlVSzF1bFpJSW44S3l0d2NuUU9rQTA0cHFxeThEL2pJOHYzMGc0a0QvOUhjbVA3SGVESGpGVW04MVNodCtFWmNaR09XRmRXZDIvSzJxMUhiS29UMlhDc3RMQzhwVldPUnVSeU1YMUJjL2NLaEFRQUEifQ== -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["n"],"name":[1],"type":["int"],"align":["right"]}],"data":[{"1":"4"}],"options":{"columns":{"min":{},"max":[10],"total":[1]},"rows":{"min":[10],"max":[10],"total":[1]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>Los valores normales de la creatinfosfoquinasa (CPK) son entre 32 y 294 U/L para los hombres y 33 a 211 U/L. Valores de altos, pueden afectar. Veamos qué ocurre en el data set:</p>
+<p>En esta gráfica se muestran el porcentaje de personas fallecidas que eran o no fumadoras, por sexo. Como podemos observar, el hecho de fumar no ha provocado una diferencia significativa, exectuando en las mujeres atendidas. Esto se debe a que tan solo 4 mujeres del total eran fumadoras.</p>
+<p>Veamos ahora la presión arterial alta:</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5jcGtfbXVqZXJlczwtIGRhdGElPiVcbiAgZmlsdGVyKGRhdGEkc2V4PT0wICwgZGF0YSRjcmVhdGluaW5lX3Bob3NwaG9raW5hc2U+Mjk0KSAlPiVcbiAgZ3JvdXBfYnkoREVBVEhfRVZFTlQpJT4lXG4gIGNvdW50KClcblxuXG5jcGtfaG9tYnJlczwtIGRhdGElPiVcbiAgZmlsdGVyKGRhdGEkc2V4PT0xICwgZGF0YSRjcmVhdGluaW5lX3Bob3NwaG9raW5hc2U+MjExKSAlPiVcbiAgZ3JvdXBfYnkoREVBVEhfRVZFTlQpJT4lXG4gIGNvdW50KCkgXG5cblxucG9yY19tdWVydF9tdWpfY3BrPC0gY3BrX211amVyZXMkbltjcGtfbXVqZXJlcyRERUFUSF9FVkVOVD09MV0qMTAwL2RlYXRoX2J5X2dlbmRlciRwb3JjZW50YWplX211ZXJ0b3NbZGVhdGhfYnlfZ2VuZGVyJHNleD09J211amVyJ11cblxucG9yY19tdWVydF9ob21icmVfY3BrPC0gY3BrX2hvbWJyZXMkbltjcGtfaG9tYnJlcyRERUFUSF9FVkVOVD09MV0qMTAwL2RlYXRoX2J5X2dlbmRlciRwb3JjZW50YWplX211ZXJ0b3NbZGVhdGhfYnlfZ2VuZGVyJHNleD09J2hvbWJyZSddXG5gYGAifQ== -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaGlwZXJfdGVuc2lvbiA8LWRhdGEgJT4lXG4gIGZpbHRlcihkYXRhJGhpZ2hfYmxvb2RfcHJlc3N1cmU9PTEpICU+JVxuICBncm91cF9ieShkZWF0aCklPiVcbiAgY291bnQoKVxuXG5oaXBlcl90ZW5zaW9uXG5gYGAifQ== -->
+<pre class="r"><code>hiper_tension &lt;-data %&gt;%
+  filter(data$high_blood_pressure==1) %&gt;%
+  group_by(death)%&gt;%
+  count()
+
+hiper_tension</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjJ9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFRU3c2Q01CQWRmaHBJTkNRZXdoVWtRTHlBZWdEamltMkZLa1JzQ1pUbzBwT0RVOUpHMGtXbk02OXZadDdyOVp4blFSNEFnQU11SHNmREZGYW5TNUllVWdEWHhzckNGMS9lSDJUdE1KSGdSdDB3RS83MUVjL2VhUFNLaHZROUp1RUNERW9pU0h6dnlJc2FkTC9qNzVnaDN1dTVYd3pUTkkzbVhFMEs1K1VLTENrUmxaYk1NSmh0YTk2S21qTnN0S1VienhCbWRRWVFEa3d1S3FPaUd0Z3p5aEtwWHRrR0pkRmFmSXZLNVU1M1VyTThOV3RGMmFObVZHdHR5STAycXRpaTdkbFEzSFkxRS9xYkVPMWp3UVhSdktEZ2pVWm1jekQrQUJubUc4dkdBUUFBIn0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["death"],"name":[1],"type":["int"],"align":["right"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"0","2":"66"},{"1":"1","2":"39"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>Como vemos, aproximadamente el 63% de los fallecidos no tenían la tensión alta.</p>
+<p>Los valores normales de la creatinfosfoquinasa (CPK) son entre 32 y 294 U/L para los hombres y 33 a 211 U/L. un valor alto puede deberse a que exista algún tejido afectado . Veamos qué ocurre en el data set:</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5jcGtfbXVqZXJlczwtIGRhdGElPiVcbiAgZmlsdGVyKGRhdGEkc2V4PT0wICwgZGF0YSRjcmVhdGluaW5lX3Bob3NwaG9raW5hc2U+Mjk0KSAlPiVcbiAgZ3JvdXBfYnkoZGVhdGgpJT4lXG4gIGNvdW50KClcblxuY3BrX211amVyZXNcbmBgYCJ9 -->
 <pre class="r"><code>
 cpk_mujeres&lt;- data%&gt;%
   filter(data$sex==0 , data$creatinine_phosphokinase&gt;294) %&gt;%
-  group_by(DEATH_EVENT)%&gt;%
+  group_by(death)%&gt;%
   count()
 
-
-cpk_hombres&lt;- data%&gt;%
+cpk_mujeres</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjJ9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFReXc2Q01CQmNCRFNRK0VqOEJNK1NDUEVMOUFPTUo2NFZxaEt4SmJSRWozNDV1SzF0MUI1b1o0ZlozWmtlOTNrVzV6RUErQkRnNTRjSVlidzdiTkp0Q2hDTXNQTHdUNlR1SjZxV0NCUTVOVGRvd2JkZWZmQmZZMWpVUkFnRWl4OHlMb2treWJrbGQrcklvNVkvRW9hOHNITmZlQXpEMEx0enJXaWhseHV5cEVSZXJXV0doOXMyNFkyc09NUEdrVW9UT3NhODFpSG1IVk9MeW5WeDdkaHRuU256SmpVWWg5N1BxeGlzVmdhREdSV2FVV1BLTGhXajFtcE5UclEyeFF4VDZ6eEowMVpNMmxkQ1ZpU1NTMkoxY2NGcnkraHMwTDhCVHlUKzVjVUJBQUE9In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["death"],"name":[1],"type":["int"],"align":["right"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"0","2":"35"},{"1":"1","2":"13"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY3BrX2hvbWJyZXM8LSBkYXRhJT4lXG4gIGZpbHRlcihkYXRhJHNleD09MSAsIGRhdGEkY3JlYXRpbmluZV9waG9zcGhva2luYXNlPjIxMSkgJT4lXG4gIGdyb3VwX2J5KGRlYXRoKSU+JVxuICBjb3VudCgpIFxuY3BrX2hvbWJyZXNcbmBgYCJ9 -->
+<pre class="r"><code>cpk_hombres&lt;- data%&gt;%
   filter(data$sex==1 , data$creatinine_phosphokinase&gt;211) %&gt;%
-  group_by(DEATH_EVENT)%&gt;%
+  group_by(death)%&gt;%
   count() 
-
-
-porc_muert_muj_cpk&lt;- cpk_mujeres$n[cpk_mujeres$DEATH_EVENT==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex==&#39;mujer&#39;]
-
-porc_muert_hombre_cpk&lt;- cpk_hombres$n[cpk_hombres$DEATH_EVENT==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex==&#39;hombre&#39;]</code></pre>
+cpk_hombres</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-frame-begin eyJtZXRhZGF0YSI6eyJjbGFzc2VzIjpbImdyb3VwZWRfZGYiLCJ0YmxfZGYiLCJ0YmwiLCJkYXRhLmZyYW1lIl0sIm5yb3ciOjIsIm5jb2wiOjJ9LCJyZGYiOiJINHNJQUFBQUFBQUFCbDFReXc2Q01CQmM1R0VnVVVuOEJvK1FDUEVMOU9EUmVPSmFvUW9SV3dJbGV2VEx3UzFwSSttaDI5M3A3TzVNcjZjc0RiSUFBR3h3OE5ndXB1QWRML3Zra0FBNEM2d3NmUEhsL1VIV0ZoTUpydFFORStGZm4vSHNqRVkzcjBuWFlSTE93S0FnZ3NUM2xyeW9RZmRiL280WjRwMmUrOFV3anVOZ3p0V2tjRnF1d0lJU1VXckpESVBadHVTTnFEakR4b1YwNHhyQ3JOWUFOajJUaTRvb0wzdjJqRklwWHJrR3BkQ2EvWXJLNVVwblZLTmNOY3FqN0ZFeHFxWFc1RVpyVmF6UjllUW5idHFLQ2YxTGlIYXg0SUpvWHBEeldpT1ROeGgrMXNhZkFjVUJBQUE9In0= -->
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["death"],"name":[1],"type":["int"],"align":["right"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]}],"data":[{"1":"0","2":"72"},{"1":"1","2":"37"}],"options":{"columns":{"min":{},"max":[10],"total":[2]},"rows":{"min":[10],"max":[10],"total":[2]},"pages":{}}}
+  </script>
+</div>
+<!-- rnb-frame-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5wb3JjX211ZXJ0X211al9jcGs8LSBjcGtfbXVqZXJlcyRuW2Nwa19tdWplcmVzJGRlYXRoPT0xXSoxMDAvZGVhdGhfYnlfZ2VuZGVyJHBvcmNlbnRhamVfbXVlcnRvc1tkZWF0aF9ieV9nZW5kZXIkc2V4PT0nbXVqZXInXVxuXG5wb3JjX211ZXJ0X2hvbWJyZV9jcGs8LSBjcGtfaG9tYnJlcyRuW2Nwa19ob21icmVzJGRlYXRoPT0xXSoxMDAvZGVhdGhfYnlfZ2VuZGVyJHBvcmNlbnRhamVfbXVlcnRvc1tkZWF0aF9ieV9nZW5kZXIkc2V4PT0naG9tYnJlJ11cblxucG9yY19tdWVydF9ob21icmVfY3BrXG5gYGAifQ== -->
+<pre class="r"><code>
+porc_muert_muj_cpk&lt;- cpk_mujeres$n[cpk_mujeres$death==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex==&#39;mujer&#39;]
+
+porc_muert_hombre_cpk&lt;- cpk_hombres$n[cpk_hombres$death==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex==&#39;hombre&#39;]
+
+porc_muert_hombre_cpk</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDU3LjI5MzI4XG4ifQ== -->
+<pre><code>[1] 57.29328</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucG9yY19tdWVydF9tdWpfY3BrXG5gYGAifQ== -->
+<pre class="r"><code>porc_muert_muj_cpk</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM2LjcwMjQzXG4ifQ== -->
+<pre><code>[1] 36.70243</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<p>A normal heart’s ejection fraction may be between 50 and 70 percent. Por debajo, puede ser un problema:</p>
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuXG5lamVjdGlvbl9mcmFjdGlvbiA8LSBkYXRhICU+JVxuICBmaWx0ZXIoZGF0YSRlamVjdGlvbl9mcmFjdGlvbjw1MCkgJT4lXG4gIGdyb3VwX2J5KERFQVRIX0VWRU5UKSU+JVxuICBjb3VudCgpXG5cbmBgYFxuYGBgIn0= -->
-<pre class="r"><code>```r
-
-ejection_fraction &lt;- data %&gt;%
-  filter(data$ejection_fraction&lt;50) %&gt;%
-  group_by(DEATH_EVENT)%&gt;%
-  count()
-</code></pre>
-<p>```</p>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<p>The typical reference range for serum creatinine is 60 to 110 micromoles per liter (μmol/L) (0.7 to 1.2 milligrams per deciliter (mg/dL)) for men and 45 to 90 μmol/L (0.5 to 1.0 mg/dL) for women:</p>
-<p>ACABAR ESTO!!!!!</p>
 <!-- rnb-text-end -->
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkhlYXJ0IEZhaWx1cmUgUHJlZGljdGlvbiINCmF1dGhvcjogTG9sYSBHw7NtZXogSmVtZXMNCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCkVsIGRhdGFzZXQgZWxlZ2lkbyBwYXJhIGVzdGUgcHJveWVjdG8gaGEgc2lkbyBIZWFydCBGYWlsdXJlIFByZWRpY3Rpb24sIGRpc3BvbmlibGUgZW4gS2FnZ2xlIChsaW5rOiBodHRwczovL3d3dy5rYWdnbGUuY29tL2FuZHJld212ZC9oZWFydC1mYWlsdXJlLWNsaW5pY2FsLWRhdGEpLiANCg0KTGFzIGVuZmVybWVkYWRlcyBjYXJkaW92YXNjdWxhcmVzIChFQ1YpIHNvbiBsYSBwcmltZXJhIGNhdXNhIGRlIG11ZXJ0ZSBlbiBlbCBtdW5kbywgeSBzZSBjYWxjdWxhIHF1ZSBzZSBjb2JyYW4gMTcsOSBtaWxsb25lcyBkZSB2aWRhcyBjYWRhIGHDsW8uDQoNCkxhIGluc3VmaWNpZW5jaWEgY2FyZMOtYWNhIGVzIHVuIGV2ZW50byBjb23Dum4gY2F1c2FkbyBwb3IgbGFzIEVDVi4gRW4gZXN0ZSBjb25qdW50byBkZSBkYXRvcyBzZSBwcmVzZW50YWIgMTIgY2FyYWN0ZXLDrXN0aWNhcywgIGNvbW8gZWwgY29uc3VtbyBkZSB0YWJhY28sIGxhIGRpZXRhIHBvY28gc2FsdWRhYmxlIHkgbGEgb2Jlc2lkYWQsIHF1ZSBwdWVkZW4gdXRpbGl6YXJzZSBwYXJhIHByZWRlY2lyIGxhIG1vcnRhbGlkYWQgcG9yIGluc3VmaWNpZW5jaWEgY2FyZMOtYWNhLg0KDQpBbnRlcyBkZSBjb21lbnphciBhIHRyYWJhamFyIGNvbiBsb3MgZGF0b3MsIHZhbW9zIGEgY2FyZ2FyIGRvcyBsaWJyZXLDrWFzOg0KKiBEcGx5ciAoQlVTQ0EgREVGSU5JQ0nDk04pDQoqIEdncGxvdDIgKGJ1c2NhIGRlZmluaWNpw7NuKQ0KYGBge3J9DQpsaWJyYXJ5KGRwbHlyKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KYGBgDQoNCkEgY29udGludWFjacOzbiwgcHJvY2VkZW1vcyBhIGNhcmdhciBsb3MgZGF0b3MuIEFkZW3DoXMsIHZhbW9zIGEgdXRpbGl6YXIgdW5hIHNlcmllIGRlIGZ1bmNpb25lcyBwYXJhIGNvbWVuemFyIGEgY29ub2NlciBsb3MgZGF0b3MuDQpgYGB7cn0NCmRhdGEgPC0gcmVhZC5jc3YoJy4vZGF0YS9oZWFydF9mYWlsdXJlLmNzdicpDQpzdHIoZGF0YSkNCmRpbShkYXRhKQ0KY29sbmFtZXMoZGF0YSkNCg0KYGBgDQoNCkNvbW8gc2UgaGEgcG9kaWRvIG9ic2VydmFyLCBlbCBkYXRhIHNldCBjb250aWVuZSAyOTkgaW5zdGFuY2lhcyB5IDEzIGF0cmlidXRvcy4gRXN0b3MgYXRyaWJ1dG9zIHNvbjogZWRhZCAobsO6bWVybyksIGFuZW1pYSAoMTogc8OtLCAwOm5vKSwgbml2ZWwgZGUgY3JlYXRpbmEgKG7Dum1lcm8pLCBkaWFiZXRlcyAoMTogc8OtLCAwOm5vKSwgZnJhY2Npw7NuIGRlIGV5ZWNjacOzbiAobsO6bWVybyksIHByZXNpw7NuIHNhbmd1w61uZWEgKG7Dum1lcm8pLCBuaSBBQ0FCQVIgREUgUE9ORVJMTw0KDQpgYGB7cn0NCmhlYWQoZGF0YSkNCmBgYA0KDQpWYW1vcyBhIHZlciBjdWFudG9zIGRlIGxvcyBwYWNpZW50ZXMgaGFuIG11ZXJ0bzoNCmBgYHtyfQ0KZGVhdGg8LSBkYXRhICU+JQ0KICBncm91cF9ieShkYXRhJERFQVRIX0VWRU5UKSAlPiUNCiAgY291bnQoKQ0KDQoNCg0KY29sbmFtZXMoZGVhdGgpPC1jKCdGYWxsZWNpZG8nLCdUb3RhbCcpDQpkZWF0aA0KYGBgDQoNClZhbW9zIGEgdmVyIG1vcnRhbGlkYWQgcG9yIGfDqW5lcm86DQpgYGB7cn0NCnBvcmNfbXVqZXI8LSBkYXRhICU+JQ0KICBmaWx0ZXIoc2V4PT0wKSAlPiUNCiAgZ3JvdXBfYnkoREVBVEhfRVZFTlQpJT4lDQogIGNvdW50KCkgDQoNCnBvcmNfbXVqZXI8LSBwb3JjX211amVyJT4lDQogIG11dGF0ZShwb3JjZW50YWplX211ZXJ0b3M9IHJvdW5kKG4qMTAwL3N1bShwb3JjX211amVyJG4pLDIpKQ0KDQoNCmNvbG5hbWVzKHBvcmNfbXVqZXIpPC0gYygnRmFsbGVjaWRvJywgJ1RvdGFsJywgJ1BvcmNlbnRhamUnICkNCg0KDQpwb3JjX2hvbWJyZTwtIGRhdGEgJT4lDQogIGZpbHRlcihzZXg9PTEpICU+JQ0KICBncm91cF9ieShERUFUSF9FVkVOVCklPiUNCiAgY291bnQoKSANCg0KDQpwb3JjX2hvbWJyZTwtcG9yY19ob21icmUlPiUNCiAgbXV0YXRlKHBvcmNlbnRhamVfbXVlcnRvcz0gcm91bmQobioxMDAvc3VtKHBvcmNfaG9tYnJlJG4pLDIpKQ0KDQoNCmNvbG5hbWVzKHBvcmNfaG9tYnJlKTwtIGMoJ0ZhbGxlY2lkYScsICdUb3RhbCcsICdQb3JjZW50YWplJyApDQoNCg0KDQogIA0KYGBgDQoNCg0KYGBge3J9DQpkZWF0aF9ieV9nZW5kZXIgPC0gZGF0YSAlPiUNCiAgZmlsdGVyKERFQVRIX0VWRU5UPT0xKSAlPiUNCiAgZ3JvdXBfYnkoc2V4KSU+JQ0KICBjb3VudCgpDQoNCg0KIGRlYXRoX2J5X2dlbmRlciA8LSBkZWF0aF9ieV9nZW5kZXIlPiUNCiAgIG11dGF0ZShwb3JjZW50YWplX211ZXJ0b3M9IHJvdW5kKG4qMTAwL3N1bShkZWF0aF9ieV9nZW5kZXIkbiksMikpDQogDQpkZWF0aF9ieV9nZW5kZXIkc2V4W2RlYXRoX2J5X2dlbmRlciRzZXg9PTFdPC0naG9tYnJlJw0KZGVhdGhfYnlfZ2VuZGVyJHNleFtkZWF0aF9ieV9nZW5kZXIkc2V4PT0wXTwtJ211amVyJw0KYGBgDQoNCg0KYGBge3J9DQoNCm1pbihkYXRhJGFnZSkNCm1heChkYXRhJGFnZSkNCg0KZWRhZF9kZWF0aDwtIGRhdGElPiUNCiAgZ3JvdXBfYnkoYWdlLCBERUFUSF9FVkVOVCkgJT4lDQogIGFycmFuZ2UoZGF0YSRhZ2UpJT4lDQogIGNvdW50KCkNCg0KZWRhZF9kZWF0aCRERUFUSF9FVkVOVFtlZGFkX2RlYXRoJERFQVRIX0VWRU5UPT0wXTwtJ3Zpdm8nDQplZGFkX2RlYXRoJERFQVRIX0VWRU5UW2VkYWRfZGVhdGgkREVBVEhfRVZFTlQ9PTFdPC0nZmFsbGVjaWRvJw0KDQoNCmdncGxvdChkYXRhPSBlZGFkX2RlYXRoLCBtYXBwaW5nID0gYWVzKHg9YWdlLCB5PW4sIGNvbG9yPURFQVRIX0VWRU5UKSkrDQogIGdlb21fbGluZSgpKw0KICBmYWNldF93cmFwKH5ERUFUSF9FVkVOVCkNCiAgDQogDQogDQoNCiAgDQoNCmBgYA0KDQoNCg0KRWRhZCBtZWRpYSANCmBgYHtyfQ0KDQptZWRpYV9zdXBlcnZpdmllbnRlcyA8LSBkYXRhICU+JQ0KICBmaWx0ZXIoREVBVEhfRVZFTlQ9PTApJT4lDQogIHN1bW1hcmlzZShtZWFuKGFnZSksIG1lZGlhbihhZ2UpKQ0KDQptZWRpYV9tdWVydG9zIDwtIGRhdGEgJT4lDQogIGZpbHRlcihERUFUSF9FVkVOVD09MSklPiUNCiAgc3VtbWFyaXNlKG1lYW4oYWdlKSwgbWVkaWFuKGFnZSkpDQoNCmBgYA0KDQpGdW1hcjoNCmBgYHtyfQ0KZnVtYXJfbXVlcnRvcyA8LSBkYXRhICU+JQ0KICBmaWx0ZXIoREVBVEhfRVZFTlQ9PTEpJT4lDQogIGdyb3VwX2J5KHNtb2tpbmcsIHNleCkgJT4lDQogIGNvdW50KCkNCg0KDQpmdW1hcl9tdWVydG9zPC0gZnVtYXJfbXVlcnRvcyAlPiUNCiAgbXV0YXRlKHBvcmM9bioxMDAvc3VtKGZ1bWFyX211ZXJ0b3MkbikpICU+JQ0KICBhcnJhbmdlKHNtb2tpbmcpDQoNCmZ1bWFyX211ZXJ0b3Mkc2V4W2Z1bWFyX211ZXJ0b3Mkc2V4PT0wXTwtJ211amVyJw0KZnVtYXJfbXVlcnRvcyRzZXhbZnVtYXJfbXVlcnRvcyRzZXg9PTFdPC0naG9tYnJlJw0KZnVtYXJfbXVlcnRvcyRzbW9raW5nW2Z1bWFyX211ZXJ0b3Mkc21va2luZz09MF08LSdubycNCmZ1bWFyX211ZXJ0b3Mkc21va2luZ1tmdW1hcl9tdWVydG9zJHNtb2tpbmc9PTFdPC0nc8OtJw0KDQoNCmdncGxvdChkYXRhPSBmdW1hcl9tdWVydG9zLCBhZXMoeD1mdW1hcl9tdWVydG9zJHNtb2tpbmcsIHk9ZnVtYXJfbXVlcnRvcyRwb3JjLCBmaWxsPXNleCkpKw0KICBnZW9tX2JhcihzdGF0PSJpZGVudGl0eSIsIHBvc2l0aW9uPSJkb2RnZSIpDQpgYGANCkhpcGVydGVuc2nDs246DQoNCmBgYHtyfQ0KaGlwZXJfdGVuc2lvbiA8LWRhdGEgJT4lDQogIGZpbHRlcihkYXRhJGhpZ2hfYmxvb2RfcHJlc3N1cmU9PTEpICU+JQ0KICBncm91cF9ieShERUFUSF9FVkVOVCklPiUNCiAgY291bnQoKQ0KICANCmBgYA0KDQoNCkxvcyB2YWxvcmVzIG5vcm1hbGVzIGRlIGxhIGNyZWF0aW5mb3Nmb3F1aW5hc2EgKENQSykgc29uIGVudHJlIDMyIHkgMjk0IFUvTCBwYXJhIGxvcyBob21icmVzIHkgMzMgYSAyMTEgVS9MLiBWYWxvcmVzIGRlIGFsdG9zLCBwdWVkZW4gYWZlY3Rhci4gVmVhbW9zIHF1w6kgb2N1cnJlIGVuIGVsIGRhdGEgc2V0Og0KDQpgYGB7cn0NCg0KY3BrX211amVyZXM8LSBkYXRhJT4lDQogIGZpbHRlcihkYXRhJHNleD09MCAsIGRhdGEkY3JlYXRpbmluZV9waG9zcGhva2luYXNlPjI5NCkgJT4lDQogIGdyb3VwX2J5KERFQVRIX0VWRU5UKSU+JQ0KICBjb3VudCgpDQoNCg0KY3BrX2hvbWJyZXM8LSBkYXRhJT4lDQogIGZpbHRlcihkYXRhJHNleD09MSAsIGRhdGEkY3JlYXRpbmluZV9waG9zcGhva2luYXNlPjIxMSkgJT4lDQogIGdyb3VwX2J5KERFQVRIX0VWRU5UKSU+JQ0KICBjb3VudCgpIA0KDQoNCnBvcmNfbXVlcnRfbXVqX2NwazwtIGNwa19tdWplcmVzJG5bY3BrX211amVyZXMkREVBVEhfRVZFTlQ9PTFdKjEwMC9kZWF0aF9ieV9nZW5kZXIkcG9yY2VudGFqZV9tdWVydG9zW2RlYXRoX2J5X2dlbmRlciRzZXg9PSdtdWplciddDQoNCnBvcmNfbXVlcnRfaG9tYnJlX2NwazwtIGNwa19ob21icmVzJG5bY3BrX2hvbWJyZXMkREVBVEhfRVZFTlQ9PTFdKjEwMC9kZWF0aF9ieV9nZW5kZXIkcG9yY2VudGFqZV9tdWVydG9zW2RlYXRoX2J5X2dlbmRlciRzZXg9PSdob21icmUnXQ0KYGBgDQoNCkEgbm9ybWFsIGhlYXJ0J3MgZWplY3Rpb24gZnJhY3Rpb24gbWF5IGJlIGJldHdlZW4gNTAgYW5kIDcwIHBlcmNlbnQuIFBvciBkZWJham8sIHB1ZWRlIHNlciB1biBwcm9ibGVtYToNCg0KYGBge3J9DQoNCmVqZWN0aW9uX2ZyYWN0aW9uIDwtIGRhdGEgJT4lDQogIGZpbHRlcihkYXRhJGVqZWN0aW9uX2ZyYWN0aW9uPDUwKSAlPiUNCiAgZ3JvdXBfYnkoREVBVEhfRVZFTlQpJT4lDQogIGNvdW50KCkNCg0KDQoNCmBgYA0KDQpUaGUgdHlwaWNhbCByZWZlcmVuY2UgcmFuZ2UgZm9yIHNlcnVtIGNyZWF0aW5pbmUgaXMgNjAgdG8gMTEwIG1pY3JvbW9sZXMgcGVyIGxpdGVyICjOvG1vbC9MKSAoMC43IHRvIDEuMiBtaWxsaWdyYW1zIHBlciBkZWNpbGl0ZXIgKG1nL2RMKSkgZm9yIG1lbiBhbmQgNDUgdG8gOTAgzrxtb2wvTCAoMC41IHRvIDEuMCBtZy9kTCkgZm9yIHdvbWVuOg0KDQpBQ0FCQVIgRVNUTyEhISEhDQoNCg0KDQo=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkhlYXJ0IEZhaWx1cmUgUHJlZGljdGlvbiINCmF1dGhvcjogIkxvbGEgR8OzbWV6IEplbWVzIg0Kb3V0cHV0OiBodG1sX25vdGVib29rDQotLS0NCg0KRWwgZGF0YXNldCBlbGVnaWRvIHBhcmEgZXN0ZSBwcm95ZWN0byBoYSBzaWRvIEhlYXJ0IEZhaWx1cmUgUHJlZGljdGlvbiwgZGlzcG9uaWJsZSBlbiBLYWdnbGUgKGxpbms6IGh0dHBzOi8vd3d3LmthZ2dsZS5jb20vYW5kcmV3bXZkL2hlYXJ0LWZhaWx1cmUtY2xpbmljYWwtZGF0YSkuIA0KDQpMYXMgZW5mZXJtZWRhZGVzIGNhcmRpb3Zhc2N1bGFyZXMgKEVDVikgc29uIGxhIHByaW1lcmEgY2F1c2EgZGUgbXVlcnRlIGVuIGVsIG11bmRvLCB5IHNlIGNhbGN1bGEgcXVlIHNlIGNvYnJhbiAxNyw5IG1pbGxvbmVzIGRlIHZpZGFzIGNhZGEgYcOxby4NCg0KTGEgaW5zdWZpY2llbmNpYSBjYXJkw61hY2EgZXMgdW4gZXZlbnRvIGNvbcO6biBjYXVzYWRvIHBvciBsYXMgRUNWLiBFbiBlc3RlIGNvbmp1bnRvIGRlIGRhdG9zIHNlIHByZXNlbnRhYiAxMiBjYXJhY3RlcsOtc3RpY2FzLCAgY29tbyBlbCBjb25zdW1vIGRlIHRhYmFjbywgbGEgZGlldGEgcG9jbyBzYWx1ZGFibGUgeSBsYSBvYmVzaWRhZCwgcXVlIHB1ZWRlbiB1dGlsaXphcnNlIHBhcmEgcHJlZGVjaXIgbGEgbW9ydGFsaWRhZCBwb3IgaW5zdWZpY2llbmNpYSBjYXJkw61hY2EuDQoNCkVuIGVzdGUgZG9jdW1lbnRvIHNlIHJlY29nZSB1bmEgcHJpbWVyYSB0b21hIGRlIGNvbnRhY3RvIGNvbiBsb3MgZGF0b3MsIGVuIGVsIHF1ZSBzZSB2YW4gYSBlc3R1ZGlhciBhbGd1bm9zIGRlIGxvcyBhdHJpYnV0b3MgZGVsIGRhdGFzZXQgeSBzdSBpbmZsdWVuY2lhIG8gbm8gZW4gbGEgc3VwZXJ2aXZlbmNpYSBkZWwgcGFjaWVudGUuDQoNCkFudGVzIGRlIGNvbWVuemFyIGEgdHJhYmFqYXIgY29uIGxvcyBkYXRvcywgdmFtb3MgYSBjYXJnYXIgZG9zIGxpYnJlcsOtYXM6DQoqIERwbHlyOiBlcyB1bm8gZGUgbG9zIHBhcXVldGVzIHByaW5jaXBhbGVzIGRlIHRpZHl2ZXJzZS4gU2UgdHJhdGEgZGUgdW4gY29uanVudG8gZGUgZnVuY2lvbmVzIGRpc2XDsWFkYXMgcGFyYSBwZXJtaXRpciBsYSBtYW5pcHVsYWNpw7NuIGRlIG1hcmNvcw0KKiBHZ3Bsb3QyOiBzIHVuIHBhcXVldGUgZGUgdmlzdWFsaXphY2nDs24gZGUgZGF0b3MuDQpgYGB7cn0NCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KGdncGxvdDIpDQpgYGANCg0KQSBjb250aW51YWNpw7NuLCBwcm9jZWRlbW9zIGEgY2FyZ2FyIGxvcyBkYXRvcy4gQWRlbcOhcywgdmFtb3MgYSB1dGlsaXphciB1bmEgc2VyaWUgZGUgZnVuY2lvbmVzIHBhcmEgY29tZW56YXIgYSBjb25vY2VyIGxvcyBkYXRvcy4NCg0KYGBge3J9DQpkYXRhIDwtIHJlYWQuY3N2KCcuL2RhdGEvaGVhcnRfZmFpbHVyZS5jc3YnKQ0Kc3RyKGRhdGEpDQpkaW0oZGF0YSkNCmNvbG5hbWVzKGRhdGEpDQoNCmBgYA0KDQpDb21vIHNlIGhhIHBvZGlkbyBvYnNlcnZhciwgZWwgZGF0YSBzZXQgY29udGllbmUgMjk5IGluc3RhbmNpYXMgeSAxMyBhdHJpYnV0b3MuIEVzdG9zIGF0cmlidXRvcyBzb246IGVkYWQsIGFuZW1pYSAoMTogc8OtLCAwOm5vKSwgbml2ZWwgZGUgY3JlYXRpbmEsIGRpYWJldGVzICgxOiBzw60sIDA6bm8pLCBmcmFjY2nDs24gZGUgZXllY2Npw7NuLCBwcmVzacOzbiBzYW5ndcOtbmVhICgxOiBhbHRhLCAwOm5vIGVzdMOhIGFsdGEpLCBuaXZlbCBkZSBwbGFxdWV0YXMgLCBuaXZlbCBkZSBjcmVhdGluYSBzw6lyaWNhLCBzb2RpbyBzw6lyaWNvLCBzZXhvLCBmdW1hZG9yICgxOiBzw60sIDA6bm8pLCB0aWVtcG8gKGhhY2UgcmVmZW5jaWEgYWwgdGllbXBvIHF1ZSBzZSBoYSBlc3RhZG8gaGFjaWVuZG8gc2VndWltaWVudG8gYWwgcGFjaWVudGUpLCB5IG11ZXJ0ZSAoMTptdWVydG8sIDA6dml2bykuDQoNClZhbW9zIGEgZWNoYXIgdW4gdmlzdGF6byBhIGxvcyBkYXRvcy4gUGFyYSBlbGxvLCB2YW1vcyBhIG1vc3RyYXMgbGFzIDUgcHJpbWVyYXMgaW5zdGFuY2lhcyBkZWwgZGF0YSBmcmFtZToNCg0KYGBge3J9DQpoZWFkKGRhdGEpDQpgYGANCg0KQSBjb250aW51YWNpw7NuLCB2YW1vcyBhIGNhbGN1bGFyIGN1w6FudG9zIHBhY2llbnRlcyBoYW4gZmFsbGVjaWRvOg0KYGBge3J9DQpkZWF0aDwtIGRhdGEgJT4lDQogIGdyb3VwX2J5KGRhdGEkZGVhdGgpICU+JQ0KICBjb3VudCgpDQoNCg0KDQpjb2xuYW1lcyhkZWF0aCk8LWMoJ0ZhbGxlY2lkbycsJ1RvdGFsJykNCmRlYXRoDQpgYGANCg0KQWhvcmEsIHZhbW9zIGEgdmlzdWFsaXphciBsYSBtb3J0YWxpZGFkIHNlZ8O6biBlbCBzZXhvOg0KYGBge3J9DQpkZWF0aF9ieV9nZW5kZXIgPC0gZGF0YSAlPiUNCiAgZmlsdGVyKGRlYXRoPT0xKSAlPiUNCiAgZ3JvdXBfYnkoc2V4KSU+JQ0KICBjb3VudCgpDQoNCg0KIGRlYXRoX2J5X2dlbmRlciA8LSBkZWF0aF9ieV9nZW5kZXIlPiUNCiAgIG11dGF0ZShwb3JjZW50YWplX211ZXJ0b3M9IHJvdW5kKG4qMTAwL3N1bShkZWF0aF9ieV9nZW5kZXIkbiksMikpDQogDQpkZWF0aF9ieV9nZW5kZXIkc2V4W2RlYXRoX2J5X2dlbmRlciRzZXg9PTFdPC0naG9tYnJlJw0KZGVhdGhfYnlfZ2VuZGVyJHNleFtkZWF0aF9ieV9nZW5kZXIkc2V4PT0wXTwtJ211amVyJw0KDQpkZWF0aF9ieV9nZW5kZXINCmBgYA0KQSBzaW1wbGUgdmlzdGEsIHBhcmVjZSBxdWUgbGEgbW9ydGFsaWRhZCBlcyBtw6FzIGFsdGEgZW4gaG9tYnJlcyBxdWUgZW4gbXVqZXJlcywgcGVybyBhbCBjYWxjdWxhciBlbCBwb3JjZW50YWplIGRlIG11ZXJ0b3MgZW4gY2FkYSBzZXhvIG5vcyBlbmNvbnRyYW1vcyBmcmVudGUgYSBlc3RvOg0KDQpgYGB7cn0NCnBvcmNfbXVqZXI8LSBkYXRhICU+JQ0KICBmaWx0ZXIoc2V4PT0wKSAlPiUNCiAgZ3JvdXBfYnkoZGVhdGgpJT4lDQogIGNvdW50KCkgDQoNCnBvcmNfbXVqZXI8LSBwb3JjX211amVyJT4lDQogIG11dGF0ZShwb3JjZW50YWplX211ZXJ0b3M9IHJvdW5kKG4qMTAwL3N1bShwb3JjX211amVyJG4pLDIpKQ0KDQoNCmNvbG5hbWVzKHBvcmNfbXVqZXIpPC0gYygnRmFsbGVjaWRhJywgJ1RvdGFsJywgJ1BvcmNlbnRhamUnICkNCnBvcmNfbXVqZXINCg0KcG9yY19ob21icmU8LSBkYXRhICU+JQ0KICBmaWx0ZXIoc2V4PT0xKSAlPiUNCiAgZ3JvdXBfYnkoZGVhdGgpJT4lDQogIGNvdW50KCkgDQoNCnBvcmNfaG9tYnJlPC1wb3JjX2hvbWJyZSU+JQ0KICBtdXRhdGUocG9yY2VudGFqZV9tdWVydG9zPSByb3VuZChuKjEwMC9zdW0ocG9yY19ob21icmUkbiksMikpDQoNCg0KY29sbmFtZXMocG9yY19ob21icmUpPC0gYygnRmFsbGVjaWRvJywgJ1RvdGFsJywgJ1BvcmNlbnRhamUnICkNCnBvcmNfaG9tYnJlDQogDQpgYGANCkVsIDMxLDk2JSBkZSBsYXMgaG9tYnJlcyB0b3RhbGVzIGhhbiBmYWxsZWNpZG8sIGZyZW50ZSBhbCAzMiwzNyUgZGUgbGFzIG11amVyZXMuDQoNCkEgY29udGludWFjacOzbiwgdmFtb3MgYSBlc3R1ZGlhciBsYSBlZGFkLiBWYW1vcyBhIGNyZWFyIGRvcyBncsOhZmljYXMsIGVuIGxhcyBxdWUgc2UgbXVlc3RyZSBlbCBuw7ptZXJvIGRlIHBlcnNvbmFzIHZpdmFzIHkgbXVlcnRhcyBzZWfDum4gbGEgZWRhZC4NCmBgYHtyfQ0KDQptaW4oZGF0YSRhZ2UpDQptYXgoZGF0YSRhZ2UpDQoNCmVkYWRfZGVhdGg8LSBkYXRhJT4lDQogIGdyb3VwX2J5KGFnZSwgZGVhdGgpICU+JQ0KICBhcnJhbmdlKGRhdGEkYWdlKSU+JQ0KICBjb3VudCgpDQoNCmVkYWRfZGVhdGgkZGVhdGhbZWRhZF9kZWF0aCRkZWF0aD09MF08LSd2aXZvJw0KZWRhZF9kZWF0aCRkZWF0aFtlZGFkX2RlYXRoJGRlYXRoPT0xXTwtJ2ZhbGxlY2lkbycNCg0KDQpnZ3Bsb3QoZGF0YT0gZWRhZF9kZWF0aCwgbWFwcGluZyA9IGFlcyh4PWFnZSwgeT1uLCBjb2xvcj1kZWF0aCkpKw0KICBnZW9tX2xpbmUoKSsNCiAgZmFjZXRfd3JhcCh+ZGVhdGgpDQogIA0KIA0KYGBgDQpWZW1vcyBxdWUgdGVuZW1vcyB1biBwaWNvIGRlIHBlcnNvbmFzIGZhbGxlY2lkYXMgZW4gdG9ybm8gYSBsb3MgNjAgYcOxb3MuDQoNClZhbW9zIGEgdmVyIGxhIGVkYWQgbWVkaWEgZGUgY2FkYSBncnVwby4gQWRlbcOhcywgdmFtb3MgYSBlbmZyZW50YXIgZXN0ZSB2YWxvciBhIGxhIG1lZGlhbmEuDQpgYGB7cn0NCg0KbWVkaWFfc3VwZXJ2aXZpZW50ZXMgPC0gZGF0YSAlPiUNCiAgZmlsdGVyKGRlYXRoPT0wKSU+JQ0KICBzdW1tYXJpc2UobWVhbihhZ2UpLCBtZWRpYW4oYWdlKSkNCg0KbWVkaWFfc3VwZXJ2aXZpZW50ZXMNCg0KbWVkaWFfbXVlcnRvcyA8LSBkYXRhICU+JQ0KICBmaWx0ZXIoZGVhdGg9PTEpJT4lDQogIHN1bW1hcmlzZShtZWFuKGFnZSksIG1lZGlhbihhZ2UpKQ0KDQptZWRpYV9tdWVydG9zDQpgYGANCkxhIGVkYWQgbWVkaWEgZGUgbXVlcnRlIHNlIGVuY3VlbnRyYSBlbiB0b3JubyBhIGxvcyA2NSBhw7FvcywgZnJlbnRlIGEgbGEgZGUgc3VwZXJ2aXZlbmNpYSBkZSA1OSBhw7Fvcy4NCg0KVmVhbW9zIGFob3JhIHNpLCBhIHNpbXBsZSB2aXN0YSwgZWwgZmFjdG9yIGZ1bWFyIGFmZWN0YSBhIGxhIHN1cGVydml2ZW5jaWEgZGUgbG9zIHBhY2llbnRlcy4NCmBgYHtyfQ0KZnVtYXJfbXVlcnRvcyA8LSBkYXRhICU+JQ0KICBmaWx0ZXIoZGVhdGg9PTEpJT4lDQogIGdyb3VwX2J5KHNtb2tpbmcsIHNleCkgJT4lDQogIGNvdW50KCkNCg0KDQpmdW1hcl9tdWVydG9zPC0gZnVtYXJfbXVlcnRvcyAlPiUNCiAgbXV0YXRlKHBvcmM9bioxMDAvc3VtKGZ1bWFyX211ZXJ0b3MkbikpICU+JQ0KICBhcnJhbmdlKHNtb2tpbmcpDQoNCmZ1bWFyX211ZXJ0b3Mkc2V4W2Z1bWFyX211ZXJ0b3Mkc2V4PT0wXTwtJ211amVyJw0KZnVtYXJfbXVlcnRvcyRzZXhbZnVtYXJfbXVlcnRvcyRzZXg9PTFdPC0naG9tYnJlJw0KZnVtYXJfbXVlcnRvcyRzbW9raW5nW2Z1bWFyX211ZXJ0b3Mkc21va2luZz09MF08LSdubycNCmZ1bWFyX211ZXJ0b3Mkc21va2luZ1tmdW1hcl9tdWVydG9zJHNtb2tpbmc9PTFdPC0nc8OtJw0KDQoNCmdncGxvdChkYXRhPSBmdW1hcl9tdWVydG9zLCBhZXMoeD1mdW1hcl9tdWVydG9zJHNtb2tpbmcsIHk9ZnVtYXJfbXVlcnRvcyRwb3JjLCBmaWxsPXNleCkpKw0KICBnZW9tX2JhcihzdGF0PSJpZGVudGl0eSIsIHBvc2l0aW9uPSJkb2RnZSIpDQoNCmZ1bWFkb3JhIDwtIGRhdGElPiUNCiAgZmlsdGVyKHNleD09MCwgc21va2luZz09MSklPiUNCiAgY291bnQoKQ0KDQpmdW1hZG9yYQ0KYGBgDQpFbiBlc3RhIGdyw6FmaWNhIHNlIG11ZXN0cmFuIGVsIHBvcmNlbnRhamUgZGUgcGVyc29uYXMgZmFsbGVjaWRhcyBxdWUgZXJhbiBvIG5vIGZ1bWFkb3JhcywgcG9yIHNleG8uIENvbW8gcG9kZW1vcyBvYnNlcnZhciwgZWwgaGVjaG8gZGUgZnVtYXIgbm8gaGEgcHJvdm9jYWRvIHVuYSBkaWZlcmVuY2lhIHNpZ25pZmljYXRpdmEsIGV4ZWN0dWFuZG8gZW4gbGFzIG11amVyZXMgYXRlbmRpZGFzLiBFc3RvIHNlIGRlYmUgYSBxdWUgdGFuIHNvbG8gNCBtdWplcmVzIGRlbCB0b3RhbCBlcmFuIGZ1bWFkb3Jhcy4gDQoNCg0KVmVhbW9zIGFob3JhIGxhIHByZXNpw7NuIGFydGVyaWFsIGFsdGE6DQpgYGB7cn0NCmhpcGVyX3RlbnNpb24gPC1kYXRhICU+JQ0KICBmaWx0ZXIoZGF0YSRoaWdoX2Jsb29kX3ByZXNzdXJlPT0xKSAlPiUNCiAgZ3JvdXBfYnkoZGVhdGgpJT4lDQogIGNvdW50KCkNCg0KaGlwZXJfdGVuc2lvbg0KYGBgDQpDb21vIHZlbW9zLCBhcHJveGltYWRhbWVudGUgZWwgNjMlIGRlIGxvcyBmYWxsZWNpZG9zIG5vIHRlbsOtYW4gbGEgdGVuc2nDs24gYWx0YS4NCg0KTG9zIHZhbG9yZXMgbm9ybWFsZXMgZGUgbGEgY3JlYXRpbmZvc2ZvcXVpbmFzYSAoQ1BLKSBzb24gZW50cmUgMzIgeSAyOTQgVS9MIHBhcmEgbG9zIGhvbWJyZXMgeSAzMyBhIDIxMSBVL0wuIHVuIHZhbG9yIGFsdG8gcHVlZGUgZGViZXJzZSBhIHF1ZSBleGlzdGEgYWxnw7puIHRlamlkbyBhZmVjdGFkbyAuIFZlYW1vcyBxdcOpIG9jdXJyZSBlbiBlbCBkYXRhIHNldDoNCg0KYGBge3J9DQoNCmNwa19tdWplcmVzPC0gZGF0YSU+JQ0KICBmaWx0ZXIoZGF0YSRzZXg9PTAgLCBkYXRhJGNyZWF0aW5pbmVfcGhvc3Bob2tpbmFzZT4yOTQpICU+JQ0KICBncm91cF9ieShkZWF0aCklPiUNCiAgY291bnQoKQ0KDQpjcGtfbXVqZXJlcw0KY3BrX2hvbWJyZXM8LSBkYXRhJT4lDQogIGZpbHRlcihkYXRhJHNleD09MSAsIGRhdGEkY3JlYXRpbmluZV9waG9zcGhva2luYXNlPjIxMSkgJT4lDQogIGdyb3VwX2J5KGRlYXRoKSU+JQ0KICBjb3VudCgpIA0KY3BrX2hvbWJyZXMNCg0KDQpgYGANCg0KDQoNCg0KDQoNCg==</div>
 
 
 

@@ -1,6 +1,6 @@
 ---
 title: "Heart Failure Prediction"
-author: Lola Gómez Jemes
+author: "Lola Gómez Jemes"
 output: html_notebook
 ---
 
@@ -10,15 +10,18 @@ Las enfermedades cardiovasculares (ECV) son la primera causa de muerte en el mun
 
 La insuficiencia cardíaca es un evento común causado por las ECV. En este conjunto de datos se presentab 12 características,  como el consumo de tabaco, la dieta poco saludable y la obesidad, que pueden utilizarse para predecir la mortalidad por insuficiencia cardíaca.
 
+En este documento se recoge una primera toma de contacto con los datos, en el que se van a estudiar algunos de los atributos del dataset y su influencia o no en la supervivencia del paciente.
+
 Antes de comenzar a trabajar con los datos, vamos a cargar dos librerías:
-* Dplyr (BUSCA DEFINICIÓN)
-* Ggplot2 (busca definición)
+* Dplyr: es uno de los paquetes principales de tidyverse. Se trata de un conjunto de funciones diseñadas para permitir la manipulación de marcos
+* Ggplot2: s un paquete de visualización de datos.
 ```{r}
 library(dplyr)
 library(ggplot2)
 ```
 
 A continuación, procedemos a cargar los datos. Además, vamos a utilizar una serie de funciones para comenzar a conocer los datos.
+
 ```{r}
 data <- read.csv('./data/heart_failure.csv')
 str(data)
@@ -27,16 +30,18 @@ colnames(data)
 
 ```
 
-Como se ha podido observar, el data set contiene 299 instancias y 13 atributos. Estos atributos son: edad (número), anemia (1: sí, 0:no), nivel de creatina (número), diabetes (1: sí, 0:no), fracción de eyección (número), presión sanguínea (número), ni ACABAR DE PONERLO
+Como se ha podido observar, el data set contiene 299 instancias y 13 atributos. Estos atributos son: edad, anemia (1: sí, 0:no), nivel de creatina, diabetes (1: sí, 0:no), fracción de eyección, presión sanguínea (1: alta, 0:no está alta), nivel de plaquetas , nivel de creatina sérica, sodio sérico, sexo, fumador (1: sí, 0:no), tiempo (hace refencia al tiempo que se ha estado haciendo seguimiento al paciente), y muerte (1:muerto, 0:vivo).
+
+Vamos a echar un vistazo a los datos. Para ello, vamos a mostras las 5 primeras instancias del data frame:
 
 ```{r}
 head(data)
 ```
 
-Vamos a ver cuantos de los pacientes han muerto:
+A continuación, vamos a calcular cuántos pacientes han fallecido:
 ```{r}
 death<- data %>%
-  group_by(data$DEATH_EVENT) %>%
+  group_by(data$death) %>%
   count()
 
 
@@ -45,41 +50,10 @@ colnames(death)<-c('Fallecido','Total')
 death
 ```
 
-Vamos a ver mortalidad por género:
-```{r}
-porc_mujer<- data %>%
-  filter(sex==0) %>%
-  group_by(DEATH_EVENT)%>%
-  count() 
-
-porc_mujer<- porc_mujer%>%
-  mutate(porcentaje_muertos= round(n*100/sum(porc_mujer$n),2))
-
-
-colnames(porc_mujer)<- c('Fallecido', 'Total', 'Porcentaje' )
-
-
-porc_hombre<- data %>%
-  filter(sex==1) %>%
-  group_by(DEATH_EVENT)%>%
-  count() 
-
-
-porc_hombre<-porc_hombre%>%
-  mutate(porcentaje_muertos= round(n*100/sum(porc_hombre$n),2))
-
-
-colnames(porc_hombre)<- c('Fallecida', 'Total', 'Porcentaje' )
-
-
-
-  
-```
-
-
+Ahora, vamos a visualizar la mortalidad según el sexo:
 ```{r}
 death_by_gender <- data %>%
-  filter(DEATH_EVENT==1) %>%
+  filter(death==1) %>%
   group_by(sex)%>%
   count()
 
@@ -89,53 +63,83 @@ death_by_gender <- data %>%
  
 death_by_gender$sex[death_by_gender$sex==1]<-'hombre'
 death_by_gender$sex[death_by_gender$sex==0]<-'mujer'
+
+death_by_gender
 ```
+A simple vista, parece que la mortalidad es más alta en hombres que en mujeres, pero al calcular el porcentaje de muertos en cada sexo nos encontramos frente a esto:
+
+```{r}
+porc_mujer<- data %>%
+  filter(sex==0) %>%
+  group_by(death)%>%
+  count() 
+
+porc_mujer<- porc_mujer%>%
+  mutate(porcentaje_muertos= round(n*100/sum(porc_mujer$n),2))
 
 
+colnames(porc_mujer)<- c('Fallecida', 'Total', 'Porcentaje' )
+porc_mujer
+
+porc_hombre<- data %>%
+  filter(sex==1) %>%
+  group_by(death)%>%
+  count() 
+
+porc_hombre<-porc_hombre%>%
+  mutate(porcentaje_muertos= round(n*100/sum(porc_hombre$n),2))
+
+
+colnames(porc_hombre)<- c('Fallecido', 'Total', 'Porcentaje' )
+porc_hombre
+ 
+```
+El 31,96% de las hombres totales han fallecido, frente al 32,37% de las mujeres.
+
+A continuación, vamos a estudiar la edad. Vamos a crear dos gráficas, en las que se muestre el número de personas vivas y muertas según la edad.
 ```{r}
 
 min(data$age)
 max(data$age)
 
 edad_death<- data%>%
-  group_by(age, DEATH_EVENT) %>%
+  group_by(age, death) %>%
   arrange(data$age)%>%
   count()
 
-edad_death$DEATH_EVENT[edad_death$DEATH_EVENT==0]<-'vivo'
-edad_death$DEATH_EVENT[edad_death$DEATH_EVENT==1]<-'fallecido'
+edad_death$death[edad_death$death==0]<-'vivo'
+edad_death$death[edad_death$death==1]<-'fallecido'
 
 
-ggplot(data= edad_death, mapping = aes(x=age, y=n, color=DEATH_EVENT))+
+ggplot(data= edad_death, mapping = aes(x=age, y=n, color=death))+
   geom_line()+
-  facet_wrap(~DEATH_EVENT)
+  facet_wrap(~death)
   
  
- 
-
-  
-
 ```
+Vemos que tenemos un pico de personas fallecidas en torno a los 60 años.
 
-
-
-Edad media 
+Vamos a ver la edad media de cada grupo. Además, vamos a enfrentar este valor a la mediana.
 ```{r}
 
 media_supervivientes <- data %>%
-  filter(DEATH_EVENT==0)%>%
+  filter(death==0)%>%
   summarise(mean(age), median(age))
+
+media_supervivientes
 
 media_muertos <- data %>%
-  filter(DEATH_EVENT==1)%>%
+  filter(death==1)%>%
   summarise(mean(age), median(age))
 
+media_muertos
 ```
+La edad media de muerte se encuentra en torno a los 65 años, frente a la de supervivencia de 59 años.
 
-Fumar:
+Veamos ahora si, a simple vista, el factor fumar afecta a la supervivencia de los pacientes.
 ```{r}
 fumar_muertos <- data %>%
-  filter(DEATH_EVENT==1)%>%
+  filter(death==1)%>%
   group_by(smoking, sex) %>%
   count()
 
@@ -152,55 +156,48 @@ fumar_muertos$smoking[fumar_muertos$smoking==1]<-'sí'
 
 ggplot(data= fumar_muertos, aes(x=fumar_muertos$smoking, y=fumar_muertos$porc, fill=sex))+
   geom_bar(stat="identity", position="dodge")
-```
-Hipertensión:
 
+fumadora <- data%>%
+  filter(sex==0, smoking==1)%>%
+  count()
+
+fumadora
+```
+En esta gráfica se muestran el porcentaje de personas fallecidas que eran o no fumadoras, por sexo. Como podemos observar, el hecho de fumar no ha provocado una diferencia significativa, exectuando en las mujeres atendidas. Esto se debe a que tan solo 4 mujeres del total eran fumadoras. 
+
+
+Veamos ahora la presión arterial alta:
 ```{r}
 hiper_tension <-data %>%
   filter(data$high_blood_pressure==1) %>%
-  group_by(DEATH_EVENT)%>%
+  group_by(death)%>%
   count()
-  
+
+hiper_tension
 ```
+Como vemos, aproximadamente el 63% de los fallecidos no tenían la tensión alta.
 
-
-Los valores normales de la creatinfosfoquinasa (CPK) son entre 32 y 294 U/L para los hombres y 33 a 211 U/L. Valores de altos, pueden afectar. Veamos qué ocurre en el data set:
+Los valores normales de la creatinfosfoquinasa (CPK) son entre 32 y 294 U/L para los hombres y 33 a 211 U/L. un valor alto puede deberse a que exista algún tejido afectado . Veamos qué ocurre en el data set:
 
 ```{r}
 
 cpk_mujeres<- data%>%
   filter(data$sex==0 , data$creatinine_phosphokinase>294) %>%
-  group_by(DEATH_EVENT)%>%
+  group_by(death)%>%
   count()
 
-
+cpk_mujeres
 cpk_hombres<- data%>%
   filter(data$sex==1 , data$creatinine_phosphokinase>211) %>%
-  group_by(DEATH_EVENT)%>%
+  group_by(death)%>%
   count() 
-
-
-porc_muert_muj_cpk<- cpk_mujeres$n[cpk_mujeres$DEATH_EVENT==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex=='mujer']
-
-porc_muert_hombre_cpk<- cpk_hombres$n[cpk_hombres$DEATH_EVENT==1]*100/death_by_gender$porcentaje_muertos[death_by_gender$sex=='hombre']
-```
-
-A normal heart's ejection fraction may be between 50 and 70 percent. Por debajo, puede ser un problema:
-
-```{r}
-
-ejection_fraction <- data %>%
-  filter(data$ejection_fraction<50) %>%
-  group_by(DEATH_EVENT)%>%
-  count()
-
+cpk_hombres
 
 
 ```
 
-The typical reference range for serum creatinine is 60 to 110 micromoles per liter (μmol/L) (0.7 to 1.2 milligrams per deciliter (mg/dL)) for men and 45 to 90 μmol/L (0.5 to 1.0 mg/dL) for women:
 
-ACABAR ESTO!!!!!
+
 
 
 
