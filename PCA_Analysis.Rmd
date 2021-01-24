@@ -1,0 +1,81 @@
+---
+title: "ANÁLISIS PCA"
+output: html_notebook
+---
+
+
+En primer lugar, cargamos los datos:
+```{r}
+hf <- read.csv('./data/heart_failure.csv')
+```
+
+A continuación, vamos a conocer un poco más nuestro dataset:
+```{r}
+dim(hf)
+colnames(hf)
+```
+Como vemos, tiene 299 instancias y 13 características/atributos. 
+
+
+```{r}
+hf.data<- as.matrix(hf[1:12])
+
+row.names(hf.data) <- c(1:299)
+status <- hf$death
+```
+
+
+El siguient paso, es llevar a cabo el análisis PCA. Antes de comenzar, vamos a analizar si sería necesario escalar los datos. 
+
+
+```{r}
+print("Media")
+colMeans(hf.data)
+
+print("Desciación típica")
+apply(hf.data, 2, sd)
+
+
+```
+
+Viendo los resultados obtenidos, es necesario escalar. En la función prcomp, establecemos el argumento scale a TRUE.
+
+```{r}
+hf.pr <- prcomp(hf.data, scale=TRUE, center=TRUE)
+summary(hf.pr)
+```
+A continuación, vamos a visualizar el modelo para poder comprender mejor estos resultados. Vamos a utilizar la función biplot
+
+```{r}
+biplot(hf.pr)
+```
+```{r}
+# Scatter plot observations by components 1 and 2
+plot(hf.pr$x[, c(1, 2)], col = (status + 1), 
+     xlab = "PC1", ylab = "PC2")
+
+
+plot(hf.pr$x[, c1, 10)], col = (status + 1), 
+     xlab = "PC1", ylab = "PC7")
+```
+
+
+```{r}
+
+par(mfrow = c(1, 2))
+
+var <-hf.pr$sdev^2
+
+pve<-var/sum(var)
+
+plot(pve, xlab = "Componentes principales", 
+     ylab = "Proportion of Variance Explained", 
+     ylim = c(0, 1), type = "b")
+
+# Plot cumulative proportion of variance explained
+plot(cumsum(pve), xlab = "Componentes Principales", 
+     ylab = "Cumulative Proportion of Variance Explained", 
+     ylim = c(0, 1), type = "b")
+```
+Como podemos observar, para conseguir un 90% variabilidad, necesitamos 10 componentes, y para un 80% 9 componentes.
+
