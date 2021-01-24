@@ -67,7 +67,6 @@ Haciendo uso del conocimiento que hemos extraído del análisis PCA, vamos a apl
 ```{r}
 pca <- prcomp(df, scale=TRUE, center=TRUE)
 pca <- pca$x[,1:10]
-
 plot_clustering(pca, k=5, "pca/")
 ```
 
@@ -75,10 +74,8 @@ El dataframe obtenido por _PCA_ genera clusters que a primera vista parecen más
 
 ```{r, fig.width= 10, fig.height=5}
 par(mfrow = c(1, 2))
-
 clustering(scaled_df, 5, c("age", "creatinine_phosphokinase"))
 clustering(pca, 5, c("PC1", "PC2"))
-
 ```
 
 Esto parece sensato, ya que precisamente el _PCA_ se encarga de extraer columnas nuevas fruto de combinación lineal de las originales de forma que exista variabilidad y sean relevantes.
@@ -103,7 +100,6 @@ Invocamos la función para los tres posibles dataframes que tenemos:
 
 ```{r, fig.width= 10, fig.height=9}
 par(mfrow = c(3, 3))
-
 plot_h_clustering(df, "raw")
 plot_h_clustering(scaled_df, "scaled")
 plot_h_clustering(pca, "pca")
@@ -113,7 +109,6 @@ Debido al número de instancias del dataset (299), la visualización del cluster
 
 ```{r, fig.width= 10, fig.height=3}
 par(mfrow = c(1, 3))
-
 plot_h_clustering(pca[1:15, 1:10], "raw")
 ```
 
@@ -123,7 +118,6 @@ plot_h_clustering(pca[1:15, 1:10], "raw")
 Lo siguiente que vamos a estudiar el efecto que tiene el número de clusters `k` sobre la bondad del clustering. Como la técnica forma parte del aprendizaje no supervisado, no puede utilizarse la columna a predecir `death` para medir la bondad del clustering, sino que se utiliza una medida llamada silhouette, que estima la distancia intracluster y la intercluster. El clustering será mejor cuanto más baja sea la suma de estas dos distancias, es decir, cuanto más baja sea la silhouette. Primero definimos una función genérica que calcule la evolución de la silhouette según `k`:
 
 ```{r}
-# silhouette
 compute_silhouette <- function(dataframe, k){
   km <- kmeans(dataframe, centers = k, nstart=50)
   sil <- silhouette(km$cluster, dist(dataframe))
@@ -135,9 +129,9 @@ plot_silhouette_by_centers <- function(dataframe, save_name){
   mean_sil <- sapply(centers, compute_silhouette, dataframe=dataframe)
   plot_filename <- paste(SAVE_PATH, "silhouette/", save_name, "_silhouette_evolution.png", sep = "")
   png(filename=plot_filename)
-  plot(centers, type='b', mean_sil, main= "Silhouette evolution by number of centers", xlab='Number of centers', ylab='Silhouette', frame=FALSE)
+  plot(centers, type='b', mean_sil, main= paste(save_name, " silhouette evolution", sep=""), xlab='k', ylab='Silhouette', frame=FALSE)
   dev.off()
-  plot(centers, type='b', mean_sil, main= "Silhouette evolution by number of centers", xlab='Number of centers', ylab='Silhouette', frame=FALSE)
+  plot(centers, type='b', mean_sil, main= paste(save_name, " silhouette evolution", sep=""), xlab='k', ylab='Silhouette', frame=FALSE)
 }
 ```
 
@@ -145,11 +139,12 @@ Y ahora la invocamos sobre el dataframe original, el escalado, y el de component
 
 ```{r, fig.width= 10, fig.height=3}
 par(mfrow = c(1, 3))
-
 plot_silhouette_by_centers(scaled_df, "scaled")
 plot_silhouette_by_centers(df, "raw")
 plot_silhouette_by_centers(pca, "pca")
 ```
+
+Como cabe esperar, la evolución de la silhouette depende del dataframe utilizado. La bondad de los clusters mejora muy rápidamente, y parece tocar su mínimo con $k=3, 4$, para después empeorar.
 
 ## Conclusión
 
