@@ -36,7 +36,7 @@ plot_clustering <- function(dataframe, k, save_path) {
       if (column2 != column1) {
         km_df <- subset(dataframe, select = c(column1, column2))
         km <- kmeans(km_df, center=k, nstart=500)
-        plot_filename <- paste(SAVE_PATH, save_path, column1, "_", column2, "_", "k_", k, ".png",sep = "")
+        plot_filename <- paste(SAVE_PATH, save_path, column1, "_", column2, "_", "k_", k, ".png", sep = "")
         png(filename=plot_filename)
         plot(km_df, col=km$cluster, main=paste(k, " clusters"))
         dev.off()
@@ -59,7 +59,7 @@ Aprovechando el conocimiento que hemos extraído del análisis PCA, voy a aplica
 pca <- prcomp(df, scale=TRUE, center=TRUE)
 pca <- pca$x[,1:10]
 
-plot_clustering(pca, centers=5, "pca/")
+plot_clustering(pca, k=5, "pca/")
 ```
 
 A continuación, vamos a definir una función que implemente el clustering jerárquico de forma genérica:
@@ -102,7 +102,7 @@ compute_silhouette <- function(dataframe, k){
 plot_silhouette_by_centers <- function(dataframe, save_name){
   centers <- 2:10
   mean_sil <- sapply(centers, compute_silhouette, dataframe=dataframe)
-  plot_filename <- paste(SAVE_PATH, "silhouette/", save_name, "_silhouette_evolution.png",sep = "")
+  plot_filename <- paste(SAVE_PATH, "silhouette/", save_name, "_silhouette_evolution.png", sep = "")
   png(filename=plot_filename)
   plot(centers, type='b', mean_sil, main= "Silhouette evolution by number of centers", xlab='Number of centers', ylab='Silhouette', frame=FALSE)
   dev.off()
