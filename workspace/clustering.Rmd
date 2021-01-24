@@ -1,23 +1,26 @@
 ---
-title: "clustering"
+title: "Clustering"
 author: "Giuliano"
-date: "24/01/2021"
-output: html_document
+date: "03/01/2021"
+output: html_notebook
 ---
 
-Nota importante: este script ha sido programado tomando como referencia la práctica de la lección 5 de la asignatura sobre aprendizaje no supervisado. Además,  también se han explorado referencias y ejemplos de interés como la documentación de R de algunos métodos del paquete cluster (https://www.rdocumentation.org/packages/cluster/versions/2.1.0/topics/silhouette, por ejemplo), algunos forums como https://medium.com/codesmart/r-series-k-means-clustering-silhouette-794774b46586, o la plataforma DataCamp.
+**Nota importante**: este script ha sido programado tomando como referencia la práctica de la lección 5 de la asignatura sobre aprendizaje no supervisado. Además,  también se han explorado referencias como la documentación de R del [paquete cluster](https://www.rdocumentation.org/packages/cluster/versions/2.1.0/topics/silhouette) y algunos ejemplos de interés en otros [forums](https://medium.com/codesmart/r-series-k-means-clustering-silhouette-794774b46586).
 
-En continuación se carga la librería de cluster, que nos proporciona el método silhouette, y se declaran algunas variables útiles:
+## Introducción
+
+En este documento se tratará de estudiar la técnica de _clustering_, también conocida como _k-means_, tanto en su versión simple, como en la versión jerárquica. Se reutilizará el conocimiento adquirido por el análisis _PCA_ para explorar las diferencias entre el dataset original escalado y el dataset de componentes principales. Por último, también se esudiará el impacto que tiene la elección del número `k` sobre la bondad de los resultados de ésta técnica.
+
+En primer lugar, se carga la librería `cluster`, que nos proporcionará más adelante el método `silhouette`, y se declaran algunas variables útiles:
 
 ```{r}
 library(cluster)
 
-SAVE_PATH <- "../data/plots/clustering/"
+SAVE_PATH <- "../data/clustering/"
 binary_columns <- c("anaemia", "diabetes", "high_blood_pressure", "sex", "smoking", "death")
 ```
 
-
-Cargamos el dataset con una simple lectura de ficheros .csv. Como el clustering es una técnica no supervisada, hay que deshacerse de la columna a predecir: la muerte del paciente. Además, hacemos el escalado del dataset, para evitar que variables de diferentes órdenes de magnitud, como por ejemplo platelets y ejection_fraction (~10^6 y ~10^2, respectivamente), influyan de forma desigual en la medida de distancia y por tanto en el clustering.
+Ahora cargamos el dataset con una simple lectura de ficheros .csv. Como el clustering es una técnica no supervisada, hay que deshacerse de la columna a predecir: la muerte del paciente. Además, hacemos el escalado del dataset, para evitar que variables de diferentes órdenes de magnitud, como por ejemplo platelets y ejection_fraction ($\sim 10^6$ y $\sim 10^2$, respectivamente), influyan de forma desigual en la medida de distancia y por tanto en el clustering.
 
 ```{r}
 df <- read.csv("../data/heart_failure.csv")
@@ -25,20 +28,24 @@ scaled_df <- data.frame(scale(df))
 head(df)
 ```
 
+## Clustering Simple
+
 Comenzando con la funcionalidad a implementar, en primer lugar, se definirá una función genérica para hacer un plot de todas las combinaciones posibles de pares de columnas, para luego poder seleccionar manualmente las gráficas de mayor interés. Aunque el clustering puede hacerse considerando más columnas, únicamente cuando tiene sentido hacer una gráfica tomándolas de dos en dos.
 
 ```{r}
-# df <- subset(df, filter, select = c("Column1", "Column2", ...))
+clustering <- function(dataframe, k, columns) {
+  km_df <- subset(dataframe, select = columns)
+  km <- kmeans(km_df, center=k, nstart=50)
+  plot(km_df, col=km$cluster, main=paste(columns[1], " y ", columns[2], "con ", k, " clusters"))
+}
 
 plot_clustering <- function(dataframe, k, save_path) {
   for (column1 in names(dataframe)) {
     for (column2 in names(dataframe)) {
       if (column2 != column1) {
-        km_df <- subset(dataframe, select = c(column1, column2))
-        km <- kmeans(km_df, center=k, nstart=500)
         plot_filename <- paste(SAVE_PATH, save_path, column1, "_", column2, "_", "k_", k, ".png", sep = "")
         png(filename=plot_filename)
-        plot(km_df, col=km$cluster, main=paste(k, " clusters"))
+        clustering(dataframe, k, c(column1, column2))
         dev.off()
       }
     }
@@ -53,7 +60,9 @@ kmeans_df <- subset(scaled_df, select = setdiff(names(scaled_df), binary_columns
 plot_clustering(kmeans_df, k = 3, "simple/")
 ```
 
-Aprovechando el conocimiento que hemos extraído del análisis PCA, voy a aplicar clustering sobre el dataset de componentes principales, tomando únicamente las columnas que garanticen un 90% de variabilidad, es decir, 10.
+## Aprovechando el PCA
+
+Haciendo uso del conocimiento que hemos extraído del análisis PCA, vamos a aplicar clustering sobre el dataset de componentes principales, tomando únicamente las columnas que garanticen un $90%$ de variabilidad, es decir, 10.
 
 ```{r}
 pca <- prcomp(df, scale=TRUE, center=TRUE)
@@ -62,6 +71,20 @@ pca <- pca$x[,1:10]
 plot_clustering(pca, k=5, "pca/")
 ```
 
+El dataframe obtenido por _PCA_ genera clusters que a primera vista parecen más significativos que los generados por el simple dataframe escalado. Véase el siguiente ejemplo:
+
+```{r, fig.width= 10, fig.height=5}
+par(mfrow = c(1, 2))
+
+clustering(scaled_df, 5, c("age", "creatinine_phosphokinase"))
+clustering(pca, 5, c("PC1", "PC2"))
+
+```
+
+Esto parece sensato, ya que precisamente el _PCA_ se encarga de extraer columnas nuevas fruto de combinación lineal de las originales de forma que exista variabilidad y sean relevantes.
+
+## Clustering Jerárquico
+
 A continuación, vamos a definir una función que implemente el clustering jerárquico de forma genérica:
 
 ```{r}
@@ -69,32 +92,40 @@ plot_h_clustering <- function(dataframe, save_name) {
   for (m in c("complete", "average", "single")) {
     hclust <- hclust(dist(dataframe), method = m)
     png(filename=paste(SAVE_PATH, "jerarquico/", save_name, "_", "distance_", m, ".png", sep = ""))
-    plot(hclust, main = paste("Hclustering del dataframe ", save_name, " con distancia: '", m, "'", sep=""))
+    plot(hclust, main = paste("Hclustering de ", save_name, ". dist: '", m, "'", sep=""))
     dev.off()
+    plot(hclust, main = paste("Hclustering de ", save_name, ". dist: '", m, "'", sep=""))
   }
 }
-
-# plot(hclust_aux)
-# abline(h=6, col="red")
-# 
-# cutree(hclust_aux, h=6)
-# cutree(hclust_aux, k=3)
 ```
 
 Invocamos la función para los tres posibles dataframes que tenemos:
 
-```{r}
+```{r, fig.width= 10, fig.height=9}
+par(mfrow = c(3, 3))
+
 plot_h_clustering(df, "raw")
 plot_h_clustering(scaled_df, "scaled")
 plot_h_clustering(pca, "pca")
 ```
 
-Lo siguiente que vamos a estudiar el efecto que tiene el número de clusters (k) sobre la bondad del clustering. Como la técnica forma parte del aprendizaje no supervisado, no puede utilizarse la columna a predecir (death) para medir la bondad del clustering, sino que se utiliza una medida llamada silhouette, que estima la distancia intracluster y la intercluster. El clustering será mejor cuanto más baja sea la suma de estas dos distancias, es decir, cuanto más baja sea la silhouette. Primero definimos una función genérica que calcule la evolución de la silhouette según k: 
+Debido al número de instancias del dataset (299), la visualización del clustering jerárquico es algo pobre, y aporta poca información. Visto de cerca, el clustering jerárquico quedaría algo como esto:
+
+```{r, fig.width= 10, fig.height=3}
+par(mfrow = c(1, 3))
+
+plot_h_clustering(pca[1:15, 1:10], "raw")
+```
+
+
+## Silhouette
+
+Lo siguiente que vamos a estudiar el efecto que tiene el número de clusters `k` sobre la bondad del clustering. Como la técnica forma parte del aprendizaje no supervisado, no puede utilizarse la columna a predecir `death` para medir la bondad del clustering, sino que se utiliza una medida llamada silhouette, que estima la distancia intracluster y la intercluster. El clustering será mejor cuanto más baja sea la suma de estas dos distancias, es decir, cuanto más baja sea la silhouette. Primero definimos una función genérica que calcule la evolución de la silhouette según `k`:
 
 ```{r}
 # silhouette
 compute_silhouette <- function(dataframe, k){
-  km <- kmeans(dataframe, centers = k, nstart=500)
+  km <- kmeans(dataframe, centers = k, nstart=50)
   sil <- silhouette(km$cluster, dist(dataframe))
   mean(sil[, 3])
 }
@@ -106,13 +137,20 @@ plot_silhouette_by_centers <- function(dataframe, save_name){
   png(filename=plot_filename)
   plot(centers, type='b', mean_sil, main= "Silhouette evolution by number of centers", xlab='Number of centers', ylab='Silhouette', frame=FALSE)
   dev.off()
+  plot(centers, type='b', mean_sil, main= "Silhouette evolution by number of centers", xlab='Number of centers', ylab='Silhouette', frame=FALSE)
 }
 ```
 
 Y ahora la invocamos sobre el dataframe original, el escalado, y el de componentes principales:
 
-```{r}
+```{r, fig.width= 10, fig.height=3}
+par(mfrow = c(1, 3))
+
 plot_silhouette_by_centers(scaled_df, "scaled")
 plot_silhouette_by_centers(df, "raw")
 plot_silhouette_by_centers(pca, "pca")
 ```
+
+## Conclusión
+
+En este estudio hemos demostrado un caso de uso para la técnica de aprendizaje no supervisado de _clustering_, explorando las diferentes opciones propuestas en la introducción. Ulteriores gráficos pueden verse en `data/clustering/`.
