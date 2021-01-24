@@ -55,10 +55,15 @@ plot(hf.pr$x[, c(1, 2)], col = (status + 1),
      xlab = "PC1", ylab = "PC2")
 
 
-plot(hf.pr$x[, c1, 10)], col = (status + 1), 
-     xlab = "PC1", ylab = "PC7")
+plot(hf.pr$x[, c(1, 10)], col = (status + 1), xlab = "PC1", ylab = "PC7")
+
 ```
 
+```{r}
+
+show(hf.pr)
+
+```
 
 ```{r}
 
