@@ -74,7 +74,7 @@ El dataframe obtenido por _PCA_ genera clusters que a primera vista parecen más
 
 ```{r, fig.width= 10, fig.height=5}
 par(mfrow = c(1, 2))
-clustering(scaled_df, 5, c("age", "creatinine_phosphokinase"))
+clustering(scaled_df, 5, c("age", "time"))
 clustering(pca, 5, c("PC1", "PC2"))
 ```
 
