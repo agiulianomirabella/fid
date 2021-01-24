@@ -97,7 +97,7 @@ porc_hombre
 El 31,96% de las hombres totales han fallecido, frente al 32,37% de las mujeres.
 
 A continuación, vamos a estudiar la edad. Vamos a crear dos gráficas, en las que se muestre el número de personas vivas y muertas según la edad.
-```{r}
+```{r, fig.width=10, fig.height=5}
 
 min(data$age)
 max(data$age)
@@ -137,7 +137,7 @@ media_muertos
 La edad media de muerte se encuentra en torno a los 65 años, frente a la de supervivencia de 59 años.
 
 Veamos ahora si, a simple vista, el factor fumar afecta a la supervivencia de los pacientes.
-```{r}
+```{r, fig.width=10, fig.height=5}
 fumar_muertos <- data %>%
   filter(death==1)%>%
   group_by(smoking, sex) %>%

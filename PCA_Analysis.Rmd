@@ -53,14 +53,14 @@ Tanto la proporción de varianza explicada como la proporción de varianza expli
 
 A continuación, vamos a visualizar el modelo para poder comprender mejor estos resultados. Para ello, vamos a utilizar la función biplot:
 
-```{r}
+```{r, fig.width=10, fig.height=5}
 biplot(x = hf.pr, scale = 0, cex = 0.6, col = c("blue", "brown3"))
-
+biplot(x = hf.pr, scale = 0, cex = 0.6, col = c("white", "brown3"))
 ```
 
 El objetivo del PCA es reducir la dimensionalidad y se suelen utilizar el número mínimo de componentes que resultan suficientes para explicar los datos. Una forma de proceder ç consiste en evaluar la proporción de varianza explicada acumulada y seleccionar el número de componentes mínimo a partir del cual el incremento deja de ser sustancial.
 
-```{r}
+```{r, fig.width=10, fig.height=5}
 
 par(mfrow = c(1, 2))
 
