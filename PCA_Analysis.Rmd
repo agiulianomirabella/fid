@@ -4,7 +4,7 @@ author: "Lola Gómez Jemes"
 output: html_notebook
 ---
 
-El análisis de componentes principales (Principal Component Analysis, PCA) es un método estadístico que permite simplificar la complejidad de espacios muestrales con muchas dimensiones a la vez que conserva su información. 
+El análisis de componentes principales (Principal Component Analysis, PCA) es un método estadístico que permite simplificar la complejidad de espacios muestrales con muchas dimensiones a la vez que conserva su información.
 
 En primer lugar, cargamos los datos de nuestra dataset "Heart Failure Clinical Data" (https://www.kaggle.com/andrewmvd/heart-failure-clinical-data):
 ```{r}
@@ -17,7 +17,7 @@ dim(hf)
 colnames(hf)
 ```
 
-Como vemos, tiene 299 instancias y 13 características/atributos. Vamos a quitar la columna correspondiente a "death" (etiqueta) y guardarla en un array "status". El resto lo guardamos en hf.data 
+Como vemos, tiene 299 instancias y 13 características/atributos. Vamos a quitar la columna correspondiente a "death" (etiqueta) y guardarla en un array "status". El resto lo guardamos en hf.data
 
 ```{r}
 hf.data<- as.matrix(hf[1:12])
@@ -28,7 +28,7 @@ status <- hf$death
 ```
 
 
-El siguient paso, es llevar a cabo el análisis PCA. Antes de comenzar, vamos a analizar si sería necesario escalar los datos. 
+El siguient paso, es llevar a cabo el análisis PCA. Antes de comenzar, vamos a analizar si sería necesario escalar los datos.
 
 ```{r}
 print("Media")
@@ -47,9 +47,9 @@ hf.pr <- prcomp(hf.data, scale=TRUE, center=TRUE)
 summary(hf.pr)
 
 ```
-La proporción de varianza explicada de cada componente principal hace referencia la cantidad de información capaz de capturar del data set original. El sumatorio de la proporción de varianza explicada acumulada de todas las componentes es siempre 1. 
+La proporción de varianza explicada de cada componente principal hace referencia la cantidad de información capaz de capturar del data set original. El sumatorio de la proporción de varianza explicada acumulada de todas las componentes es siempre 1.
 
-Tanto la proporción de varianza explicada como la proporción de varianza explicada acumulada son dos valores de gran utilidad a la hora de decidir el número de componentes principales a utilizar en los análisis posteriores. 
+Tanto la proporción de varianza explicada como la proporción de varianza explicada acumulada son dos valores de gran utilidad a la hora de decidir el número de componentes principales a utilizar en los análisis posteriores.
 
 A continuación, vamos a visualizar el modelo para poder comprender mejor estos resultados. Para ello, vamos a utilizar la función biplot:
 
@@ -68,14 +68,13 @@ var <-hf.pr$sdev^2
 
 pve<-var/sum(var)
 
-plot(pve, xlab = "Componente principal", 
-     ylab = "Proporcion de varianza explicada", 
+plot(pve, xlab = "Componente principal",
+     ylab = "Proporcion de varianza explicada",
      ylim = c(0, 1), type = "b")
 
 # Plot cumulative proportion of variance explained
-plot(cumsum(pve), xlab = "Componente Principal", 
-     ylab = "Proporción varianza explicada acumulada", 
+plot(cumsum(pve), xlab = "Componente Principal",
+     ylab = "Proporción varianza explicada acumulada",
      ylim = c(0, 1), type = "b")
 ```
 De esta forma, para conseguir un 90% variabilidad, necesitamos 10 componentes, y para un 80% 9 componentes.
-
