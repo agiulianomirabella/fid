@@ -1,0 +1,63 @@
+---
+title: "KNN"
+output: html_document
+---
+
+En primer lugar, cargamos los datos y vemos la estructura de los datos:
+```{r}
+df <- read.csv('../data/heart_failure.csv')
+ head(df)
+```
+
+Generamos un número aleatorio que sea el 90% del número total de filas del conjunto de datos:
+```{r}
+ ran <- sample(1:nrow(df), 0.9 * nrow(df)) 
+```
+
+Creamos la función de normalización:
+```{r} 
+ nor <-function(x) { (x -min(x))/(max(x)-min(x))   }
+```
+ 
+Ejecute la nomalización en las columnas del conjunto de datos que son los predictores (no se hace la normalización en las variables categóricas:
+```{r}
+ datos_norm <- as.data.frame(lapply(df[,c(1,3,5,7,8,9,12)], nor))
+```
+
+Hacemos un "resumen" de los datos normalices:
+```{r}
+ summary(datos_norm)
+```
+Dividimos los datos en 2 grupos, uno de entrenamiento y uno de test:
+```{r}
+datos_train <- datos_norm[ran,]
+
+datos_test <- datos_norm[-ran,] 
+```
+ 
+Extraemos la 13ª columna del conjunto de datos de entrenamiento porque se utilizará como argumento clasificador en la función KNN, y extraemos la 13ª columna del conjunto de datos de test para la precisión:
+```{r}
+ datos_target_category <- df[ran,13]
+ datos_test_category <- df[-ran,13]
+```
+
+Cargamos el paquete class para el KNN:
+```{r}
+ library(class)
+```
+
+Ejecutamos el KNN:
+```{r}
+ pr <- knn(datos_train,datos_test,cl=datos_target_category,k=7)
+```
+
+Creamos una matriz de confusión:
+```{r}
+ tab <- table(pr,datos_test_category)
+ knitr::kable(tab[1:2,1:2], format="html")
+```
+Esta función divide las predicciones correctas entre el número total de predicciones, lo que nos indica la precisión del modelo:
+```{r}
+ accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+ accuracy(tab)
+```

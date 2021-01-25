@@ -1,0 +1,67 @@
+---
+title: "RandomForest"
+output: html_notebook
+---
+
+En primer lugar, cargamos los paquetes:
+```{r}
+library(randomForest)
+require(caTools)
+```
+
+Cargamos los datos:
+```{r}
+data <- read.csv('../data/heart_failure.csv')
+```
+
+Después, hacemos un "resumen" de los datos para encontrar las variables categóricas:
+```{r}
+summary(data)
+```
+Entonces, cambiamos los datos para las variables categóricas:
+```{r}
+data <- transform(
+  data,
+  age=as.integer(age),
+  anaemia=as.factor(anaemia),
+  creatinine_phosphokinase=as.numeric(creatinine_phosphokinase),
+  diabetes=as.factor(diabetes),
+  ejection_fraction=as.integer(ejection_fraction),
+  high_blood_pressure=as.factor(high_blood_pressure),
+  platelets=as.integer(platelets),
+  serum_creatinine=as.numeric(serum_creatinine),
+  serum_sodium=as.integer(serum_sodium),
+  sex=as.factor(sex),
+  smoking=as.factor(smoking),
+  time=as.integer(time),
+  DEATH_EVENT=as.factor(DEATH_EVENT)
+)
+sapply(data, class)
+```
+Verificamos con un resumen:
+```{r}
+summary(data)
+```
+Dividimos los datos en 2 grupos, uno de entrenamiento y uno de test:
+```{r}
+dim(data)
+sample = sample.split(data$DEATH_EVENT, SplitRatio = 3/4)
+train = subset(data, sample == TRUE)
+test  = subset(data, sample == FALSE)
+dim(train)
+dim(test)
+```
+Hacemos el Random Forest en la variable "DEATH_EVENT":
+```{r}
+rf <- randomForest(
+  DEATH_EVENT ~ .,
+  data=train
+)
+```
+
+Por fín, hacemos predicciones con el Random Forest y vemos con una matriz de confusión si los resultados son buenos:
+```{r}
+pred = predict(rf, newdata=test[-13])
+cm = table(test[,13], pred)
+knitr::kable(cm[1:2,1:2], format="html")
+```
