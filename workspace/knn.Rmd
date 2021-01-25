@@ -1,12 +1,13 @@
 ---
 title: "KNN"
-author: "Nicolas Clement"
+author: "Nicolás Clement"
+date: "03/01/2021"
 output: html_notebook
 ---
 
 En primer lugar, cargamos los datos y vemos la estructura de los datos:
 ```{r}
-df <- read.csv('../data/heart_failure.csv')
+df <- read.csv('./data/heart_failure.csv')
  head(df)
 ```
 

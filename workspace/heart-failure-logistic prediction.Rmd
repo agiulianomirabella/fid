@@ -1,0 +1,320 @@
+---
+title: "Logistic Regression"
+author: "Yuheng He"
+date: "01/01/2021"
+output: html_notebook
+---
+
+```{r setup, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, error=FALSE)
+knitr::opts_chunk$set(out.width="100%", fig.height = 5, split=FALSE, fig.align = "default")
+options(dplyr.summarise.inform = FALSE)
+```
+
+
+
+
+## Load libraries
+```{r, message = FALSE}
+library(tidyverse)
+library(skimr)      # skimming data frames
+library(ggthemes)
+library(patchwork)  # combine separate ggplots into the same graphic
+library(corrplot)
+
+library(rsample)    # initial_split()
+library(DescTools)  # PseudoR2()
+library(sjPlot)     # tab_model(), print regression models as HTML table
+library(caret)      
+library(mlr)        
+library(rpart)      
+library(rpart.plot)
+library(ranger)     
+library(lightgbm)   
+```
+
+## read data
+```{r results=FALSE, warning=FALSE, message=FALSE}
+ROOT = "../input/heart-failure-clinical-dataset"
+palette_ro = c("#ee2f35", "#fa7211", "#fbd600", "#75c731", "#1fb86e", "#0488cf", "#7b44ab")
+df<-  read.csv ("heart_failure_clinical_records_dataset.csv")
+
+```
+
+# Check data {.tabset .tabset-fade .tabset-pills}
+
+
+## Dataset
+```{r}
+head(df, 50) %>% 
+  DT::datatable()
+```
+
+
+
+## 数据结构 data structure
+```{r}
+glimpse(df)
+```
+
+## Data summary
+```{r}
+skim(df)
+```
+
+# Data visualizations 数据可视化
+change data type to make it easier to handle in future work.
+
+
+```{r class.source="fold-show"}
+f_features = c("anaemia", "diabetes", "high_blood_pressure", "sex", "smoking", "DEATH_EVENT")
+
+df_n <- df
+df <- df %>%
+  mutate_at(f_features, as.factor)
+```
+
+
+
+### Features vs target (cuenta)
+```{r fig.cap="Fig. 1", fig.height=5}
+p1 <- ggplot(df, aes(x = anaemia, fill = DEATH_EVENT)) +
+  geom_bar(stat = "count", position = "stack", show.legend = FALSE) +
+  scale_x_discrete(labels  = c("0 (False)", "1 (True)"))+
+  scale_fill_manual(values = c(palette_ro[2], palette_ro[7]),
+                    name = "DEATH_EVENT",
+                    labels = c("0 (False)", "1 (True)")) +
+  labs(x = "Anaemia") +
+  theme_minimal(base_size = 12) +
+  geom_label(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5),
+             size = 5, show.legend = FALSE)
+
+p2 <- ggplot(df, aes(x = diabetes, fill = DEATH_EVENT)) +
+  geom_bar(stat = "count", position = "stack", show.legend = FALSE) +
+  scale_x_discrete(labels  = c("0 (False)", "1 (True)")) +
+  scale_fill_manual(values = c(palette_ro[2], palette_ro[7]),
+                    name = "DEATH_EVENT",
+                    labels = c("0 (False)", "1 (True)")) +
+  labs(x = "Diabetes") +
+  theme_minimal(base_size = 12) +
+  geom_label(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5),
+             size = 5, show.legend = FALSE)
+
+p3 <- ggplot(df, aes(x = high_blood_pressure, fill = DEATH_EVENT)) +
+  geom_bar(stat = "count", position = "stack", show.legend = FALSE) +
+  scale_x_discrete(labels  = c("0 (False)", "1 (True)")) +
+  scale_fill_manual(values = c(palette_ro[2], palette_ro[7]),
+                    name = "DEATH_EVENT",
+                    labels = c("0 (False)", "1 (True)")) +
+  labs(x = "High blood pressure") +
+  theme_minimal(base_size = 12) +
+  geom_label(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5),
+             size = 5, show.legend = FALSE)
+
+p4 <- ggplot(df, aes(x = sex, fill = DEATH_EVENT)) +
+  geom_bar(stat = "count", position = "stack", show.legend = FALSE) +
+  scale_x_discrete(labels  = c("0 (Female)", "1 (Male)")) +
+  scale_fill_manual(values = c(palette_ro[2], palette_ro[7]),
+                    name = "DEATH_EVENT",
+                    labels = c("0 (False)", "1 (True)")) +
+  labs(x = "Sex") +
+  theme_minimal(base_size = 12) +
+  geom_label(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5),
+             size = 5, show.legend = FALSE)
+
+p5 <- ggplot(df, aes(x = smoking, fill = DEATH_EVENT)) +
+  geom_bar(stat = "count", position = "stack", show.legend = FALSE) +
+  scale_x_discrete(labels  = c("0 (False)", "1 (True)")) +
+  scale_fill_manual(values = c(palette_ro[2], palette_ro[7]),
+                    name = "DEATH_EVENT",
+                    labels = c("0 (False)", "1 (True)")) +
+  labs(x = "Smoking") +
+  theme_minimal(base_size = 12) +
+  geom_label(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5),
+             size = 5, show.legend = FALSE)
+
+p6 <- ggplot(df, aes(x = DEATH_EVENT, fill = DEATH_EVENT)) +
+  geom_bar(stat = "count", position = "stack", show.legend = TRUE) +
+  scale_x_discrete(labels  = c("0 (False)", "1 (True)")) +
+  scale_fill_manual(values = c(palette_ro[2], palette_ro[7]),
+                    name = "DEATH_EVENT",
+                    labels = c("0 (False)", "1 (True)")) +
+  labs(x = "DEATH_EVENT") +
+  theme_minimal(base_size = 12) +
+  geom_label(stat = "count", aes(label = ..count..), position = position_stack(vjust = 0.5),
+             size = 5, show.legend = FALSE)
+
+((p1 + p2 + p3) / (p4 + p5 + p6)) +
+  plot_annotation(title = "Distribution of the binary features and DEATH_EVENT")
+```
+
+
+
+
+
+
+
+
+
+# Para la diabetes, el sexo y el tabaquismo, hubo poca diferencia en la distribución de la variable objetivo.
+
+# Para anemia y high_blood_pressure, existen algunas diferencias en las distribuciones de las variables objetivas, pero no sabemos si podemos decir que las diferencias son significativas.
+
+
+The median is indicated by a vertical dashed line.  
+ 
+
+### Age
+```{r fig.cap="Fig. 3", out.width="90%", fig.height=9}
+p1 <- ggplot(df, aes(x = age)) + 
+  geom_histogram(binwidth = 5, colour = "white", fill = palette_ro[6], alpha = 0.5) +
+  geom_density(eval(bquote(aes(y = ..count.. * 5))), colour = palette_ro[6], fill = palette_ro[6], alpha = 0.25) +
+    # 5 is binwidth of geom_histogram()
+    # binwidth can be calculated from "diff(range(df$age))/20"
+  scale_x_continuous(breaks = seq(40, 100, 10)) +
+  geom_vline(xintercept = median(df$age), linetype="longdash", colour = palette_ro[6]) +
+  annotate(geom = "text",
+           x = max(df$age)-5, y = 50,
+           label = str_c("Min.     : ", min(df$age),
+                         "\nMedian : ", median(df$age),
+                         "\nMean    : ", round(mean(df$age), 1),
+                         "\nMax.    : ", max(df$age))) +
+  labs(title = "age distribution") +
+  theme_minimal(base_size = 12)
+
+p2 <- ggplot(df, aes(x = age, fill = DEATH_EVENT)) + 
+  # geom_histogram(aes(y=..density..), binwidth = 5, colour = "white", position = "identity", alpha = 0.5) +
+  geom_density(alpha = 0.64) +
+  scale_fill_manual(values = c(palette_ro[2], palette_ro[7]),
+                    name = "DEATH_EVENT",
+                    labels = c("0 (False)", "1 (True)")) +
+  scale_x_continuous(breaks = seq(40, 100, 10)) +
+
+  geom_vline(xintercept = median(filter(df, DEATH_EVENT == 0)$age), linetype="longdash", colour = palette_ro[2]) +
+  geom_vline(xintercept = median(filter(df, DEATH_EVENT == 1)$age), linetype="longdash", colour = palette_ro[7]) +
+  annotate(geom = "text",
+           x = max(df$age)-10, y = 0.03,
+           label = str_c("Survived median: ", median(filter(df, DEATH_EVENT == 0)$age),
+                         "\nDead median: ", median(filter(df, DEATH_EVENT == 1)$age))) +
+
+  labs(title = "Relationship between age and DEATH_EVENT") +
+  theme_minimal(base_size = 12) +
+  theme(legend.position = "bottom", legend.direction = "horizontal")
+
+p1 / p2
+```
+
+
+#La edad máxima de los pacientes fue alrededor de los 60 años, y el número de pacientes disminuyó en un patrón en forma de campana alrededor de esa edad.
+
+#Hay una diferencia en la distribución de cada variable objetivo, cuanto más joven es la edad, más difícil es morir; la densidad de probabilidad se invierte después de la edad de poco menos de 70 años.
+
+
+
+
+      
+
+# Data preprocessing
+La función `initial_split ()` se usa para dividir el conjunto de trenes y el conjunto de prueba.
+Puede dividir el conjunto de datos mientras mantiene la proporción de la variable objetivo especificando "DEATH_EVENT" como argumento "estratos".
+
+
+
+
+
+```{r class.source="fold-show"}
+set.seed(0)
+df_split <- initial_split(df, p = 0.8, strata = DEATH_EVENT)
+train <- training(df_split)
+test <- testing(df_split)
+head(train)
+
+set.seed(0)
+df_n_split <- initial_split(df_n, p = 0.8, strata = DEATH_EVENT)
+train_n <- training(df_n_split)
+test_n <- testing(df_n_split)
+head(train_n)
+```
+
+# Train models and make predictions
+
+
+
+## Logistic regression analysis
+
+El análisis de regresión logística es un modelo utilizado para predecir y analizar la probabilidad de ocurrencia de un evento (en este caso, `DEATH_EVENT == 1`).
+Al estimar los parámetros (intercepto y coeficientes de regresión) utilizando el método de máxima verosimilitud,
+es posible calcular el cambio en las probabilidades (la relación entre la probabilidad de que suceda el evento y la probabilidad de que el evento no suceda)
+cuando cambian los valores de las variables explicativas.
+
+#121
+```{r}
+
+logistic <- glm(DEATH_EVENT ~ .,
+           family=binomial(logit), data=train)
+summary(logistic)
+
+
+```
+
+
+
+```{r class.source="fold-show"}
+lr1 <- glm(DEATH_EVENT ~ .,
+           family=binomial(logit), data=train)
+tab_model(lr1, show.r2 = FALSE, transform = NULL,
+          digits = 3, digits.p = 4)
+PseudoR2(lr1)
+```
+
+aqui, `p` represent the significance probability. 
+The lower the `p` value of the parameter, the more significant it is, and if the value is higher than 0.05, it is considered not significant. 
+We can see that there are many variables in this model that are not statistically significant.
+
+
+y we will use the stepwise method for variable selection. 
+In the stepwise method, the model is recreated many times while changing the selection of explanatory variables. 
+The model with a smaller AIC (Akaike Information Criterion; a measure of the balance between the simplicity of the model and the goodness of fit of the model) value is left as the better model.
+
+
+```{r class.source="fold-show"}
+lr2 <- step(lr1)
+
+tab_model(lr2, show.r2 = FALSE, transform = NULL,
+          digits = 3, digits.p = 4)
+PseudoR2(lr2)
+```
+
+#
+
+```{r}
+odds <- c(round( exp(lr2$coefficients["age"]*10), digits=3 ),
+          round( exp(lr2$coefficients["ejection_fraction"]), digits=3 ),
+          round( exp(lr2$coefficients["serum_creatinine"]), digits=3 ),
+          round( exp(lr2$coefficients["serum_sodium"]), digits=3 ),
+          round( exp(lr2$coefficients["time"]*7), digits=3 ))
+
+
+data.frame(variables = names(odds), odds = odds) %>%
+  mutate(description = c("Odds ratio of death for age 10 years older",
+                         "Odds ratio of death if ejection fraction id 1% higher",
+                         "Odds ratio of death if serum creatinine level is 1 mg/dL higher",
+                         "Odds ratio of death if serum sodium level is 1 mg/dL higher",
+                         "Odds ratio of death with 1 week (7 days) longer follow-up time"))
+```
+
+#Usaremos este modelo para predecir los datos de prueba.
+
+```{r}
+pred <- as.factor(predict(lr2, newdata=test, type="response") >= 0.5) %>%
+  fct_recode("0" = "FALSE", "1" = "TRUE")
+confusionMatrix(pred, test$DEATH_EVENT, positive = "1")
+
+acc_lr <- confusionMatrix(pred, test$DEATH_EVENT)$overall["Accuracy"]
+tpr_lr <- confusionMatrix(pred, test$DEATH_EVENT)$byClass["Specificity"]
+# The reason why we set the recall of this model as "Specificity" is because the default value of positive in the confusionMatrix() function is 0.
+```
+
+#The prediction using this test data showed that accuracy was 81.36% and recall (`Sensitivity`) was 68.42%.
+
+

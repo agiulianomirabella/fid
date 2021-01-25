@@ -1,10 +1,11 @@
 ---
-title: "RandomForest"
-author: "Nicolas Clement"
+title: "Random Forest"
+author: "Nicolás Clement"
+date: "05/01/2021"
 output: html_notebook
 ---
 
-En primer lugar, cargamos los paquetes:
+En primer lugar, cargamos las librerias:
 ```{r}
 library(randomForest)
 require(caTools)
@@ -12,7 +13,7 @@ require(caTools)
 
 Cargamos los datos:
 ```{r}
-data <- read.csv('../data/heart_failure.csv')
+data <- read.csv('./data/heart_failure.csv')
 ```
 
 Después, hacemos un "resumen" de los datos para encontrar las variables categóricas:
@@ -43,7 +44,7 @@ Verificamos con un resumen:
 ```{r}
 summary(data)
 ```
-Dividimos los datos en 2 grupos, uno de entrenamiento y uno de test:
+Dividimos los datos en 2 grupos, uno de formación y uno de test:
 ```{r}
 dim(data)
 sample = sample.split(data$DEATH_EVENT, SplitRatio = 3/4)
@@ -52,7 +53,7 @@ test  = subset(data, sample == FALSE)
 dim(train)
 dim(test)
 ```
-Hacemos el Random Forest en la variable "DEATH_EVENT":
+Hacemos el Random Forest en el variable "DEATH_EVENT":
 ```{r}
 rf <- randomForest(
   DEATH_EVENT ~ .,
