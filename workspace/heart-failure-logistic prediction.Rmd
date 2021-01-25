@@ -1,7 +1,6 @@
 ---
 title: "Logistic Regression"
 author: "Yuheng He"
-date: "01/01/2021"
 output: html_notebook
 ---
 

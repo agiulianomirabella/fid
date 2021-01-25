@@ -1,7 +1,6 @@
 ---
 title: "KNN"
 author: "Nicolás Clement"
-date: "03/01/2021"
 output: html_notebook
 ---
 

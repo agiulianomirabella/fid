@@ -1,7 +1,6 @@
 ---
 title: "Random Forest"
 author: "Nicolás Clement"
-date: "05/01/2021"
 output: html_notebook
 ---
 

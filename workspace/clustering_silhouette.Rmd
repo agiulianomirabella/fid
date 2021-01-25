@@ -1,7 +1,6 @@
 ---
 title: "Clustering y Silhouette"
 author: "Giuliano Mirabella"
-date: "03/01/2021"
 output: html_notebook
 ---
 
