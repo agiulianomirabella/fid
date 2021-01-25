@@ -23,7 +23,7 @@ library(ggplot2)
 A continuación, procedemos a cargar los datos. Además, vamos a utilizar una serie de funciones para comenzar a conocer los datos.
 
 ```{r}
-data <- read.csv('./data/heart_failure.csv')
+data <- read.csv('../data/heart_failure.csv')
 str(data)
 dim(data)
 colnames(data)

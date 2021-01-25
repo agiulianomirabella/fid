@@ -8,7 +8,7 @@ El análisis de componentes principales (Principal Component Analysis, PCA) es u
 
 En primer lugar, cargamos los datos de nuestra dataset "Heart Failure Clinical Data" (https://www.kaggle.com/andrewmvd/heart-failure-clinical-data):
 ```{r}
-hf <- read.csv('./data/heart_failure.csv')
+hf <- read.csv('../data/heart_failure.csv')
 ```
 
 A continuación, vamos a conocer un poco más nuestro dataset:

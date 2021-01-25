@@ -62,7 +62,7 @@ Leer la dataset heart_failure_clinical_records_dataset
 ```{r}
 
 
-heart_failure_clinical_records_dataset <- read.csv ("heart_failure_clinical_records_dataset.csv")
+heart_failure_clinical_records_dataset <- read.csv ("../data/heart_failure_clinical_records_dataset.csv")
 dim(heart_failure_clinical_records_dataset)
 head(heart_failure_clinical_records_dataset)
 str(heart_failure_clinical_records_dataset)

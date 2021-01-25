@@ -6,7 +6,7 @@ output: html_notebook
 
 En primer lugar, cargamos los datos y vemos la estructura de los datos:
 ```{r}
-df <- read.csv('./data/heart_failure.csv')
+df <- read.csv('../data/heart_failure.csv')
  head(df)
 ```
 

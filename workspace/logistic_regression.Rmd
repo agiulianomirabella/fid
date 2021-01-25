@@ -34,9 +34,9 @@ library(lightgbm)
 
 ## read data
 ```{r results=FALSE, warning=FALSE, message=FALSE}
-ROOT = "../input/heart-failure-clinical-dataset"
+ROOT = ../data/heart-failure-clinical-dataset"
 palette_ro = c("#ee2f35", "#fa7211", "#fbd600", "#75c731", "#1fb86e", "#0488cf", "#7b44ab")
-df<-  read.csv ("heart_failure_clinical_records_dataset.csv")
+df<-  read.csv ("../data/heart_failure_clinical_records_dataset.csv")
 
 ```
 
