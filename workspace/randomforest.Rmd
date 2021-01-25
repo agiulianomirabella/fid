@@ -1,5 +1,6 @@
 ---
 title: "RandomForest"
+author: "Nicolas Clement"
 output: html_notebook
 ---
 
