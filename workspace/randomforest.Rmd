@@ -66,3 +66,9 @@ pred = predict(rf, newdata=test[-13])
 cm = table(test[,13], pred)
 knitr::kable(cm[1:2,1:2], format="html")
 ```
+
+Esta función divide las predicciones correctas entre el número total de predicciones, lo que nos indica la precisión del modelo:
+```{r}
+ accuracy <- function(x){sum(diag(x)/(sum(rowSums(x)))) * 100}
+ accuracy(cm)
+```
