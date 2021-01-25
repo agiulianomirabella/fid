@@ -1,0 +1,309 @@
+---
+
+
+#desecion tree
+
+
+
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r}
+
+install.packages("tidyverse")
+install.packages("dplyr")
+install.packages("caret")
+install.packages("plyr")
+install.packages("rattle")
+install.packages("gapminder")
+install.packages("R.devices")
+install.packages("RWeka")
+install.packages("rpart.plot")
+install.packages("RGtk2")
+
+#no supervisado
+install.packages("factoextra")
+install.packages("gridExtra")
+install.packages("animation")
+install.packages("stats")
+install.packages("ggfortify")
+
+# libraries
+library(ggplot2)
+library(dplyr)
+library(magrittr)
+library(powerMediation)
+library(lubridate)
+library(tidyverse)
+library(rpart)
+library(rattle)
+library(RColorBrewer)
+library(caret)
+
+library(cluster)
+library(factoextra)
+library(gridExtra)
+library(stats)
+library(ggfortify)
+library(class)
+library(plyr)
+
+#seed
+set.seed(1)
+set.seed(678)
+set.seed(123)
+
+```
+
+
+Leer la dataset heart_failure_clinical_records_dataset
+
+```{r}
+
+
+heart_failure_clinical_records_dataset <- read.csv ("heart_failure_clinical_records_dataset.csv")
+dim(heart_failure_clinical_records_dataset)
+head(heart_failure_clinical_records_dataset)
+str(heart_failure_clinical_records_dataset)
+
+
+```
+
+
+#desecion tree 
+#ver los tipos
+
+```{r}
+str(heart_failure_clinical_records_dataset)
+```
+
+#para cambiar los labeles
+
+```{r}
+library(dplyr)
+#save again
+heart_failure_clinical_records_dataset <- heart_failure_clinical_records_dataset %>%
+#Convert to factor level
+mutate(anaemia = factor(anaemia, levels = c(0, 1), labels = c('no tiene anaemia', 'tiene anaemia')),
+diabetes = factor(diabetes, levels = c(0, 1), labels = c('no tiene diabetes', 'tiene diabetes')),
+high_blood_pressure = factor(high_blood_pressure, levels = c(0, 1), labels = c('no tiene alta presion', 'tiene alta presion')),
+sex = factor(sex, levels = c(0, 1), labels = c('femenino', 'masculino')),
+smoking = factor(smoking, levels = c(0, 1), labels = c('no fuma', 'fuma')),
+DEATH_EVENT = factor(DEATH_EVENT, levels = c(0, 1), labels = c('vivo', 'muerte'))) %>%
+na.omit()
+glimpse(heart_failure_clinical_records_dataset)
+```
+
+
+#classfica los edades a joven viejo y muy viejo
+
+```{r}
+heart_failure_clinical_records_dataset <- heart_failure_clinical_records_dataset %>%
+mutate(heart_failure_clinical_records_dataset, edad_category = ifelse(heart_failure_clinical_records_dataset$age <= 50 ,"Joven",
+ifelse(heart_failure_clinical_records_dataset$age <= 70, "Viejo",
+ifelse(heart_failure_clinical_records_dataset$age > 70, "Muy viejo","no es categoricado"))))
+
+head(heart_failure_clinical_records_dataset)
+
+```
+
+
+#copia dataset a nueva sin time
+
+```{r}
+library(dplyr)
+heart_failure_clinical_records_dataset_2 <- heart_failure_clinical_records_dataset %>%
+select(-c(time))
+```
+
+#elimilar age columna
+
+```{r}
+library(dplyr)
+heart_failure_clinical_records_dataset_2 <- heart_failure_clinical_records_dataset_2 %>%
+select(-c(age))
+```
+
+
+
+
+
+
+
+
+#Visualización de datos
+#做图，可以随意更改
+
+
+
+
+
+```{r}
+barplot(table(heart_failure_clinical_records_dataset_2$diabetes),
+main="Bars de diabetes",
+xlab="diabetes",
+ylab="Cuanto diabetes"
+)
+```
+
+
+
+
+
+
+
+```{r}
+library(ggplot2)
+b1 <- ggplot(heart_failure_clinical_records_dataset_2, aes(DEATH_EVENT))
+b1 + geom_bar()
+b1 + geom_bar(aes(fill = diabetes))
+```
+#高血压在死亡人数中的占比
+```{r}
+library(ggplot2)
+b1 <- ggplot(heart_failure_clinical_records_dataset_2, aes(DEATH_EVENT))
+b1 + geom_bar()
+b1 + geom_bar(aes(fill = high_blood_pressure))
+```
+#histogram可视化直方图
+```{r}
+hist(heart_failure_clinical_records_dataset$age)
+```
+
+
+```{r}
+hist(heart_failure_clinical_records_dataset$serum_creatinine)
+```
+
+
+#不同性别组类中serum_creatinine血清肌酐和死亡的关系
+
+```{r}
+ggplot(heart_failure_clinical_records_dataset,aes(x=sex,y=serum_creatinine,fill=DEATH_EVENT)) + geom_col(position = "dodge")
+
+```
+
+#不同性别组类射血分数ejection_fraction和死亡的关系
+```{r}
+ggplot(heart_failure_clinical_records_dataset,aes(x=sex, y= ejection_fraction,fill=DEATH_EVENT))+
+  geom_col(position = "dodge")
+
+```
+
+
+
+
+
+
+
+#test and train Mixtal las lineas
+
+```{r}
+
+shuffle_index <- sample(1:nrow(heart_failure_clinical_records_dataset_2))
+head(shuffle_index)
+
+heart_failure_clinical_records_dataset_2 <- heart_failure_clinical_records_dataset_2[shuffle_index, ]
+head(heart_failure_clinical_records_dataset_2)
+
+```
+
+
+#funcion de reparticion dataset train y test
+
+```{r}
+create_train_test <- function(data, size = 0.8, train = TRUE) {
+n_row = nrow(data)
+total_row = size * n_row
+train_sample = c(1: total_row)
+if (train == TRUE) {
+return (data[train_sample, ])
+} else {
+return (data[-train_sample, ])
+}
+}
+
+```
+
+
+
+```{r}
+par("mar")
+```
+
+
+
+```{r}
+par(mar=c(1,1,1,1))
+```
+
+#训练集和测试集
+
+```{r}
+data_train <- create_train_test(heart_failure_clinical_records_dataset_2, 0.8, train = TRUE)
+data_test <- create_train_test(heart_failure_clinical_records_dataset_2, 0.8, train = FALSE)
+dim(data_train)
+dim(data_test)
+```
+
+
+
+
+```{r}
+prop.table(table(data_train$DEATH_EVENT))
+```
+
+
+#desicion tree training our model
+
+
+```{r}
+library(rpart)
+library(rpart.plot)
+fit <- rpart(DEATH_EVENT~., data = data_train, method = 'class')
+rpart.plot(fit, extra = 106)
+
+fancyRpartPlot(fit)
+```
+
+#从上图我们可以看出来决策树第一级是serum_creatinine,依次是：ejection_fraction----edad_category---platelets---creatinine_phosphokinase----sex.
+# En la figura anterior, podemos ver que el primer nivel del árbol de decisión es sérum_creatinina, seguido de: eyección_fracción ---- edad_categoría --- plaquetas --- creatinina_fosfocinasa ---- sexo.
+
+
+
+```{r}
+library(rpart)
+library(rpart.plot)
+fit <- rpart(DEATH_EVENT~., data = data_train, method = 'class', parms = list(split=("information")))
+rpart.plot(fit, extra = 106)
+
+fancyRpartPlot(fit)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
