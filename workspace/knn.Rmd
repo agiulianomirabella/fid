@@ -1,6 +1,7 @@
 ---
 title: "KNN"
-output: html_document
+author: "Nicolas Clement"
+output: html_notebook
 ---
 
 En primer lugar, cargamos los datos y vemos la estructura de los datos:
